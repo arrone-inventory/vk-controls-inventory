@@ -82,6 +82,15 @@
 .app-layout .status-warn{color:#b7791f}
 .app-layout .mobile-menu-toggle{color:#17211c}
 </style>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#15805d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VK Controls">
+<link rel="apple-touch-icon" href="./icons/icon-192.svg">
+
 </head>
 <body>
 
@@ -2059,5 +2068,8 @@ ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
 })();
 })();
 </script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('VK Controls service worker:',e)));}</script>
+
 </body>
 </html>
