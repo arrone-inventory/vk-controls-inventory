@@ -280,6 +280,9 @@
           <button class="topbar-btn" onclick="window.CoffeeApp.logout()" title="Sign out of this account">
             <span>↪</span> <span>Sign Out</span>
           </button>
+          <button class="topbar-btn change-password-btn" onclick="window.CoffeeApp.openChangePasswordModal()" title="Change your account password">
+            <span>🔐</span> <span>Change Password</span>
+          </button>
         </div>
       </header>
 
@@ -1822,6 +1825,65 @@
 .owner-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin:16px 0}.owner-card{margin-bottom:0}.owner-muted{font-size:11px;color:var(--muted);margin-top:4px}.owner-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.owner-stat{padding:13px;border:1px solid var(--border);border-radius:9px;background:#181c22}.owner-stat span{display:block;font-size:10px;color:var(--muted)}.owner-stat strong{display:block;font-size:22px;margin-top:5px}.owner-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#14171c}.owner-check-grid label{font-size:11px;color:#d8dbe1;display:flex;gap:6px;align-items:center}.owner-check-grid input{accent-color:#b37d51}@media(max-width:900px){.owner-grid{grid-template-columns:1fr}.owner-check-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.flow-stages-grid{grid-template-columns:1fr 1fr}.flow-connector{display:none}.dept-breakdown-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.mobile-open{transform:translateX(0)}.main-wrapper{margin-left:0}.mobile-menu-toggle{display:inline-block;background:none;border:0;color:#fff;font-size:22px;margin-right:8px}.topbar{height:auto;padding:12px;gap:10px;align-items:flex-start}.topbar-right{display:none}.content-body{padding:12px}.kpi-grid,.executive-metrics-grid,.executive-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.flow-stages-grid{grid-template-columns:1fr}.dept-breakdown-grid{grid-template-columns:1fr}.table-toolbar{align-items:flex-start;flex-direction:column}.search-input{width:140px}}
+
+/* VK CONTROLS — mobile login compact layout */
+@media (max-width:600px){
+  .vk-login-screen{padding:0;overflow-y:auto}
+  .vk-login-top{padding:12px 16px 8px;min-height:auto}
+  .vk-brand-lockup{gap:8px}
+  .vk-brand-mark{font-size:26px}
+  .vk-brand-name{font-size:17px;letter-spacing:.08em}
+  .vk-brand-sub{font-size:7px;letter-spacing:.12em}
+  .vk-login-shell{min-height:0;height:auto}
+  .vk-login-story{min-height:150px;height:150px;background-position:center 35%;align-items:flex-end}
+  .vk-story-content{padding:18px 18px 16px;margin:0}
+  .vk-eyebrow{font-size:9px;letter-spacing:.18em;margin-bottom:6px}
+  .vk-story-content h1{font-size:25px;line-height:1.02;margin:0 0 7px}
+  .vk-story-content p{font-size:10.5px;line-height:1.35;max-width:100%}
+  .vk-login-card{padding:22px 18px 24px;min-height:0}
+  .vk-login-logo{gap:8px;margin-bottom:18px}
+  .vk-login-cup{font-size:32px}
+  .vk-login-logo strong{font-size:17px}
+  .vk-login-logo span{font-size:7px;letter-spacing:.18em;margin-top:2px}
+  .vk-login-heading h2{font-size:21px;margin-bottom:5px}
+  .vk-login-heading p{font-size:11px;margin-bottom:17px}
+  .vk-input-wrap{height:50px;border-radius:12px;padding:0 12px;margin-bottom:10px}
+  .vk-input-wrap>span{font-size:17px;margin-right:9px}
+  .vk-input-wrap input{font-size:14px}
+  .vk-login-options{font-size:11px;margin:7px 1px 14px}
+  .vk-signin{height:50px;border-radius:12px;font-size:15px}
+  .vk-or{margin:17px 0 10px;font-size:10px}
+  .vk-otp-btn{height:46px;border-radius:12px;font-size:13px}
+  .vk-login-hint{font-size:9px;margin-top:9px}
+  .vk-login-footer{font-size:8px;margin:8px 0 10px;padding:0}
+}
+@media (max-width:380px){
+  .vk-login-top{padding:9px 12px 6px}
+  .vk-brand-mark{font-size:23px}
+  .vk-brand-name{font-size:15px}
+  .vk-brand-sub{font-size:6px}
+  .vk-login-story{height:128px;min-height:128px}
+  .vk-story-content{padding:13px 14px 12px}
+  .vk-story-content h1{font-size:22px}
+  .vk-story-content p{font-size:9px}
+  .vk-login-card{padding:17px 14px 20px}
+  .vk-login-logo{margin-bottom:13px}
+  .vk-login-heading h2{font-size:19px}
+  .vk-login-heading p{font-size:10px;margin-bottom:13px}
+  .vk-input-wrap{height:46px}
+  .vk-signin{height:46px}
+  .vk-or{margin:13px 0 8px}
+  .vk-otp-btn{height:43px}
+}
+
+
+.change-password-btn{white-space:nowrap}
+@media(max-width:760px){
+  .topbar-right{display:flex;align-items:center;gap:6px}
+  .topbar-right>*:not(.change-password-btn){display:none}
+  .change-password-btn{display:inline-flex!important;padding:7px 9px;font-size:11px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1972,6 +2034,43 @@ async function handleOtpLogin(){
   try{sessionStorage.setItem('vkCoffeeAuth',JSON.stringify({id:u.id,name:profile.name,role:profile.role}));localStorage.removeItem('vkCoffeeRemember')}catch(e){}
   await loadCloudState(); renderAll(); hideLogin(); toast('OTP login successful');
 }
+
+function openChangePasswordModal(){
+  const modal=$('modal-change-password');
+  if(!modal)return;
+  ['cp-current','cp-new','cp-confirm'].forEach(id=>{if($(id))$(id).value=''});
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  setTimeout(()=>$('cp-current')?.focus(),50);
+}
+async function submitChangePassword(){
+  const current=$('cp-current')?.value||'';
+  const next=$('cp-new')?.value||'';
+  const confirmPwd=$('cp-confirm')?.value||'';
+  if(!current||!next||!confirmPwd){toast('Please fill all password fields','error');return}
+  if(next.length<8){toast('New password must be at least 8 characters','error');return}
+  if(next!==confirmPwd){toast('New password and confirmation do not match','error');return}
+  const btn=$('cp-submit');
+  if(btn){btn.disabled=true;btn.textContent='Updating...'}
+  try{
+    const {data:{user},error:userError}=await supabase.auth.getUser();
+    if(userError||!user?.email)throw new Error('Your current login session is not available. Please sign in again.');
+    const {error:reauthError}=await supabase.auth.signInWithPassword({email:user.email,password:current});
+    if(reauthError)throw new Error('Current password is incorrect.');
+    const {error:updateError}=await supabase.auth.updateUser({password:next});
+    if(updateError)throw new Error(updateError.message||'Unable to update password.');
+    closeModal('modal-change-password');
+    toast('Password changed successfully','success');
+  }catch(err){
+    toast(err.message||'Unable to change password','error');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Update Password'}
+    if($('cp-current'))$('cp-current').value='';
+    if($('cp-new'))$('cp-new').value='';
+    if($('cp-confirm'))$('cp-confirm').value='';
+  }
+}
+
 function renderAll(){populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderDashboard();renderOwner()}
 function switchTab(tab){qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
 function openAddItemModal(){resetForm('form-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Add Master SKU Item';openModal('modal-item-master')}
@@ -2050,7 +2149,7 @@ document.getElementById('vk-otp-login')?.addEventListener('click',handleOtpLogin
 qsa('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 ['green-search-input','roastery-search-input','packing-search-input','retail-search-input','item-master-search-input','item-master-category-filter'].forEach(id=>$(id)?.addEventListener('input',renderAll));
 $('mobile-menu-toggle')?.addEventListener('click',()=>document.querySelector('.sidebar')?.classList.toggle('mobile-open'));
-window.CoffeeApp={switchTab,openModal,closeModal,openAddItemModal,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
+window.CoffeeApp={switchTab,openModal,closeModal,openChangePasswordModal,submitChangePassword,openAddItemModal,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
 ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
 (async function initSupabase(){
   try{
@@ -2071,6 +2170,36 @@ ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
 </script>
 
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('VK Controls service worker:',e)));}</script>
+
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="modal-change-password" aria-hidden="true">
+  <div class="modal-container" style="max-width:460px" role="dialog" aria-modal="true" aria-labelledby="change-password-title">
+    <div class="modal-header">
+      <div class="modal-title" id="change-password-title">🔐 Change Password</div>
+      <button class="modal-close-btn" type="button" onclick="window.CoffeeApp.closeModal('modal-change-password')" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="cp-current">Current Password</label>
+        <input class="form-control" id="cp-current" type="password" autocomplete="current-password" placeholder="Enter current password">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cp-new">New Password</label>
+        <input class="form-control" id="cp-new" type="password" autocomplete="new-password" placeholder="Minimum 8 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cp-confirm">Confirm New Password</label>
+        <input class="form-control" id="cp-confirm" type="password" autocomplete="new-password" placeholder="Re-enter new password">
+      </div>
+      <div class="form-hint">Your password is handled by Supabase Auth and is not saved in the inventory data.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" type="button" onclick="window.CoffeeApp.closeModal('modal-change-password')">Cancel</button>
+      <button class="topbar-btn primary" type="button" id="cp-submit" onclick="window.CoffeeApp.submitChangePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
