@@ -672,6 +672,9 @@
                   <span class="search-icon">🔍</span>
                   <input type="text" id="green-search-input" class="search-input" placeholder="Search Green SKU, Lot, Origin..." />
                 </div>
+                <button class="topbar-btn primary" onclick="window.CoffeeApp.openOpeningBalanceModal('green')">
+                  <span>📊</span> <span>+ Opening Balance</span>
+                </button>
                 <button class="topbar-btn" onclick="window.CoffeeApp.openGreenPurchaseModal()">
                   <span>📥</span> <span>+ Receive Purchase</span>
                 </button>
@@ -811,7 +814,10 @@
                   <span class="search-icon">🔍</span>
                   <input type="text" id="packing-search-input" class="search-input" placeholder="Search Packaged SKU..." />
                 </div>
-                <button class="topbar-btn primary" onclick="window.CoffeeApp.openModal('modal-packing-issue')">
+                <button class="topbar-btn primary" onclick="window.CoffeeApp.openOpeningBalanceModal('packing')">
+                  <span>📊</span> <span>+ Opening Balance</span>
+                </button>
+                <button class="topbar-btn" onclick="window.CoffeeApp.openModal('modal-packing-issue')">
                   <span>📤</span> <span>+ Issue to Dept / Party</span>
                 </button>
                 <button class="topbar-btn" style="background:rgba(212,163,115,0.15);border-color:rgba(212,163,115,0.35);color:var(--crema-light);" onclick="window.CoffeeApp.openModal('modal-new-outlet')">
@@ -875,6 +881,9 @@
                   <span class="search-icon">🔍</span>
                   <input type="text" id="retail-search-input" class="search-input" placeholder="Search Retail / Packaging SKU..." />
                 </div>
+                <button class="topbar-btn primary" onclick="window.CoffeeApp.openOpeningBalanceModal('retail')">
+                  <span>📊</span> <span>+ Opening Balance</span>
+                </button>
                 <button class="topbar-btn" onclick="window.CoffeeApp.openRetailPurchaseModal()">
                   <span>📥</span> <span>+ Receive Purchase</span>
                 </button>
@@ -1251,6 +1260,70 @@
       </div>
     </main>
 
+  </div>
+
+  <!-- ====================================================================
+       OPENING BALANCE / OPENING INVENTORY
+       ==================================================================== -->
+  <div class="modal-overlay" id="modal-opening-balance">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title"><span>📊</span> Set Opening Inventory Balance</div>
+        <button class="modal-close-btn" onclick="window.CoffeeApp.closeModal('modal-opening-balance')">&times;</button>
+      </div>
+      <form id="form-opening-balance">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Inventory Department</label>
+              <select id="ob-module" class="form-control" required>
+                <option value="green">Green Coffee</option>
+                <option value="packing">Packing / Roasted Coffee</option>
+                <option value="retail">Retail / Packaging Materials</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Opening Balance Date</label>
+              <input type="date" id="ob-date" class="form-control txn-date" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SKU / Item</label>
+            <select id="ob-sku" class="form-control" required></select>
+          </div>
+          <div class="form-row" id="ob-green-extra">
+            <div class="form-group">
+              <label class="form-label">Opening Lot / Batch</label>
+              <input type="text" id="ob-lot" class="form-control" placeholder="e.g. OPEN-SEP-26" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cost / kg (₹)</label>
+              <input type="number" step="0.01" min="0" id="ob-cost" class="form-control" placeholder="e.g. 620" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Opening Quantity</label>
+              <input type="number" step="0.01" min="0" id="ob-qty" class="form-control" placeholder="e.g. 250" required />
+              <span class="form-hint">This becomes the starting stock before purchases/receipts and issues.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Physical Count at Opening</label>
+              <input type="number" step="0.01" min="0" id="ob-physical" class="form-control" placeholder="Same as opening if verified" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opening Balance Note</label>
+            <input type="text" id="ob-notes" class="form-control" placeholder="e.g. Opening stock as per physical count on 01-Sep-2026" />
+          </div>
+          <div class="form-hint" style="padding:10px;border:1px solid var(--border);border-radius:8px;background:#14171c;">Opening Balance is recorded separately from purchases. Existing purchases and issues are not changed.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="topbar-btn" onclick="window.CoffeeApp.closeModal('modal-opening-balance')">Cancel</button>
+          <button type="submit" class="topbar-btn primary">Save Opening Balance</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- ====================================================================
@@ -2106,6 +2179,27 @@ function setGreenPhysical(id){let g=state.greenLots.find(x=>x.id===id);if(!g)ret
 function setPackingPhysical(sku){let x=state.packing[sku];let v=prompt('Enter physical count:',x.physical);if(v===null)return;x.physical=num(v);log('PHYSICAL_COUNT','Packing',sku,v,'','Physical count updated');save();toast('Physical count updated')}
 function setRetailPhysical(sku){let x=state.retail[sku];let v=prompt('Enter physical count:',x.physical);if(v===null)return;x.physical=num(v);log('PHYSICAL_COUNT','Retail',sku,v,'','Physical count updated');save();toast('Physical count updated')}
 function openNewRoastModal(){resetForm('form-roast-batch');setTxnDateDefaults();openModal('modal-new-roast')}
+function openingSkuOptions(module){
+  let items=state.items||[];
+  if(module==='green') return items.filter(i=>i.category==='Green Coffee');
+  if(module==='packing') return items.filter(i=>['Roasted Coffee','Packaged Coffee'].includes(i.category));
+  return items.filter(i=>['Packaging Material','Retail Merchandise'].includes(i.category));
+}
+function renderOpeningSkuOptions(){
+  const mod=$('ob-module')?.value||'green';
+  const sel=$('ob-sku'); if(!sel)return;
+  const arr=openingSkuOptions(mod);
+  sel.innerHTML=arr.map(i=>`<option value="${esc(i.sku)}">${esc(i.sku)} — ${esc(i.name)}</option>`).join('')||'<option value="">No matching SKU — add it in Item Master first</option>';
+  $('ob-green-extra')?.style.setProperty('display',mod==='green'?'grid':'none');
+}
+function openOpeningBalanceModal(module='green'){
+  resetForm('form-opening-balance');
+  $('ob-module').value=module;
+  $('ob-date').value=todayISO();
+  $('ob-date').max=todayISO();
+  renderOpeningSkuOptions();
+  openModal('modal-opening-balance');
+}
 function openGreenPurchaseModal(){resetForm('form-green-purchase');setTxnDateDefaults();openModal('modal-green-purchase')}
 function openIssueToRoasteryModal(){resetForm('form-issue-roastery');setTxnDateDefaults();openModal('modal-issue-roastery')}
 function openRetailPurchaseModal(){resetForm('form-retail-purchase');setTxnDateDefaults();openModal('modal-retail-purchase')}
@@ -2222,6 +2316,33 @@ submit('form-owner-user',async()=>{
     toast('User created successfully');
   }
 });
+submit('form-opening-balance',()=>{
+  const module=$('ob-module').value;
+  const d=validTxnDate($('ob-date').value,'Opening Balance Date');
+  const sku=$('ob-sku').value;
+  const q=num($('ob-qty').value);
+  const physical=$('ob-physical').value===''?q:num($('ob-physical').value);
+  if(!sku)throw Error('Select an item/SKU first');
+  if(q<0)throw Error('Opening quantity cannot be negative');
+  if(physical<0)throw Error('Physical count cannot be negative');
+  const note=$('ob-notes').value.trim()||'Opening inventory balance';
+  if(module==='green'){
+    const lot=$('ob-lot').value.trim()||('OPEN-'+d.replace(/-/g,''));
+    let g=state.greenLots.find(x=>x.sku===sku&&x.lot===lot);
+    if(g){g.opening=q;g.physical=physical;if(num($('ob-cost').value)>0)g.cost=num($('ob-cost').value)}
+    else{state.greenLots.push({id:uid('LOT'),sku,lot,supplier:'Opening Balance',opening:q,purchases:0,issued:0,physical,cost:num($('ob-cost').value)||num(item(sku)?.cost)})}
+    log('OPENING_BALANCE','Green Coffee',sku,q,lot,note,d);
+  }else if(module==='packing'){
+    let x=state.packing[sku]||{opening:0,receiving:0,issued:0,physical:0};
+    x.opening=q;x.physical=physical;state.packing[sku]=x;
+    log('OPENING_BALANCE','Packing',sku,q,'OPENING',note,d);
+  }else{
+    let x=state.retail[sku]||{opening:0,receiving:0,issued:0,physical:0};
+    x.opening=q;x.physical=physical;state.retail[sku]=x;
+    log('OPENING_BALANCE','Retail',sku,q,'OPENING',note,d);
+  }
+  closeModal('modal-opening-balance');save();toast('Opening balance saved successfully');
+});
 submit('form-green-purchase',()=>{let d=validTxnDate($('gp-date').value,'Purchase Date'),sku=$('gp-sku').value,q=num($('gp-qty').value),g=state.greenLots.find(x=>x.sku===sku&&x.lot===($('gp-lot').value||'NO-LOT'));if(g){g.purchases+=q;g.cost=num($('gp-cost').value)||g.cost}else{g={id:uid('LOT'),sku,lot:$('gp-lot').value||('LOT-'+new Date().getFullYear()+'-'+Date.now().toString().slice(-4)),supplier:$('gp-supplier').value||'',opening:0,purchases:q,issued:0,physical:q,cost:num($('gp-cost').value)||num(item(sku)?.cost)};state.greenLots.push(g)}log('PURCHASE','Green Coffee',sku,q,g.lot,$('gp-supplier').value,d);closeModal('modal-green-purchase');save();toast('Green coffee purchase recorded')});
 submit('form-issue-roastery',()=>{let d=validTxnDate($('ir-date').value,'Issue Date'),sku=$('ir-sku').value,q=num($('ir-qty').value),g=state.greenLots.find(x=>x.sku===sku);if(!g||greenBalance(g)<q)throw Error('Insufficient green coffee stock');g.issued+=q;log('ISSUE_TO_ROASTERY','Green Coffee',sku,q,'ROASTERY',$('ir-notes').value,d);closeModal('modal-issue-roastery');save();toast('Green coffee issued to roastery')});
 submit('form-roast-batch',()=>{let rd=validTxnDate($('rb-date').value,'Roast Date'),td=validTxnDate($('rb-transfer-date').value,'Transfer to Packing Date');if(td<rd)throw Error('Transfer to Packing Date cannot be before Roast Date');let gs=$('rb-green-sku').value,rs=$('rb-roasted-sku').value,gin=num($('rb-green-in').value),out=num($('rb-roasted-out').value);if(out>gin)throw Error('Roasted output cannot exceed green input');let g=state.greenLots.find(x=>x.sku===gs);if(!g||greenBalance(g)<gin)throw Error('Insufficient staged green coffee');let r={id:uid('ROAST'),batch:'RB-'+rd.replace(/-/g,'')+'-'+String(state.roasts.length+1).padStart(3,'0'),date:dateToISO(rd),transferDate:td,entryAt:now(),greenSku:gs,roastedSku:rs,greenIn:gin,roastedOut:out,machine:$('rb-machine').value,profile:$('rb-profile').value,notes:$('rb-notes').value};state.roasts.push(r);state.packing[rs] ||= {opening:0,receiving:0,issued:0,physical:0};state.packing[rs].receiving+=out;state.packing[rs].physical+=out;log('ROAST_COMPLETE','Roastery',gs,gin,rs,'Roast date '+rd+'; output '+out+' kg; loss '+(gin-out).toFixed(2)+' kg',rd);log('TRANSFER_TO_PACKING','Packing',rs,out,'PACKING','Transferred from Roastery on '+td,td);closeModal('modal-new-roast');save();toast('Roast batch and packing transfer recorded')});
@@ -2242,9 +2363,10 @@ document.getElementById('vk-login-eye')?.addEventListener('click',()=>{
 document.getElementById('vk-forgot')?.addEventListener('click',handleForgotPassword);
 document.getElementById('vk-otp-login')?.addEventListener('click',handleOtpLogin);
 qsa('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+document.getElementById('ob-module')?.addEventListener('change',renderOpeningSkuOptions);
 ['green-search-input','roastery-search-input','packing-search-input','retail-search-input','item-master-search-input','item-master-category-filter'].forEach(id=>$(id)?.addEventListener('input',renderAll));
 $('mobile-menu-toggle')?.addEventListener('click',()=>document.querySelector('.sidebar')?.classList.toggle('mobile-open'));
-window.CoffeeApp={switchTab,openModal,closeModal,openChangePasswordModal,submitChangePassword,openAddItemModal,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
+window.CoffeeApp={switchTab,openModal,closeModal,openChangePasswordModal,submitChangePassword,openAddItemModal,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,openOpeningBalanceModal,logout};
 ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
 (async function initSupabase(){
   try{
