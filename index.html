@@ -92,6 +92,11 @@
 <meta name="apple-mobile-web-app-title" content="VK Controls">
 <link rel="apple-touch-icon" href="./icons/icon-192.svg">
 
+
+<style id="vk-owner-fix">
+#form-owner-user .form-hint{display:block;margin-top:5px;line-height:1.4}
+#owner-users-table-body .action-btn{margin-right:4px}
+</style>
 </head>
 <body>
 
@@ -1231,7 +1236,7 @@
           </div>
 
           <section class="table-container-card">
-            <div class="table-toolbar"><div><h2 class="table-heading">User Access & Outlet Assignment</h2><div class="owner-muted">Assign each user a role and one or more outlets. Owner retains full control.</div></div><div class="table-actions"><button class="topbar-btn" onclick="window.CoffeeApp.exportUsersCSV()">📤 Export Users</button><button class="topbar-btn primary" onclick="window.CoffeeApp.openOwnerUserModal()">+ New User</button></div></div>
+            <div class="table-toolbar"><div><h2 class="table-heading">User Access & Outlet Assignment</h2><div class="owner-muted">Add, edit, deactivate or remove users. New users are created in Supabase Auth; role, outlet and permission access is managed here.</div></div><div class="table-actions"><button class="topbar-btn" onclick="window.CoffeeApp.exportUsersCSV()">📤 Export Users</button><button class="topbar-btn primary" onclick="window.CoffeeApp.openOwnerUserModal()">+ New User</button></div></div>
             <div class="data-table-responsive" style="margin-top:12px;">
               <table class="modern-table"><thead><tr><th>Name</th><th>Email / Login</th><th>Role</th><th>Assigned Outlets</th><th>Permissions</th><th>Status</th><th>Actions</th></tr></thead><tbody id="owner-users-table-body"></tbody></table>
             </div>
@@ -1730,7 +1735,7 @@
             <div class="form-group"><label class="form-label">Email / Login ID</label><input id="ou-email" type="email" class="form-control" required></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Password</label><input id="ou-password" type="password" class="form-control" placeholder="Set login password"></div>
+            <div class="form-group"><label class="form-label">Initial Password</label><input id="ou-password" type="password" class="form-control" placeholder="Required for a new user"><span class="form-hint">Used only when creating the Supabase login. It is never stored in inventory data.</span></div>
             <div class="form-group"><label class="form-label">Role</label><select id="ou-role" class="form-control" required><option>Owner</option><option>Admin</option><option>Manager</option><option>Inventory Controller</option><option>Purchase</option><option>Outlet Manager</option><option>Viewer</option></select></div>
             <div class="form-group"><label class="form-label">Status</label><select id="ou-status" class="form-control"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
           </div>
@@ -1925,12 +1930,22 @@ function demo(){
  txns:[{id:uid('TXN'),date:now(),module:'Green Coffee',type:'PURCHASE',sku:'GC-KEN-AA',qty:500,ref:'LOT-KEN-2609',notes:'Demo purchase'}],ownerSettings:{orgName:'Coffee & Retails',ownerName:'Main Owner',email:'',phone:'',address:'',resetOtp:''},users:[{id:'u-owner',name:'Main Owner',email:'owner@local',password:'owner123',role:'Owner',status:'Active',outlets:'ALL',permissions:['Dashboard','Inventory','Purchasing','Roastery','Reports','Import/Export','User Access']}]};
 }
 function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);return Object.assign(demo(),x)} }catch(e){} return demo()}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll(); if(window.__vkCloudReady) syncCloudState()}
+function save(){
+  try{
+    const safe=JSON.parse(JSON.stringify(state));
+    if(Array.isArray(safe.users)) safe.users=safe.users.map(u=>{const x={...u};delete x.password;delete x.loginOtp;return x});
+    localStorage.setItem(KEY,JSON.stringify(safe));
+  }catch(e){console.warn('Local save failed',e)}
+  renderAll();
+  if(window.__vkCloudReady) syncCloudState();
+}
 async function syncCloudState(){
   try{
     const {data:{session}}=await supabase.auth.getSession();
     if(!session) return;
-    await supabase.from('app_state').upsert({id:1,state,updated_by:session.user.id,updated_at:new Date().toISOString()});
+    const clean=JSON.parse(JSON.stringify(state));
+    if(Array.isArray(clean.users)) clean.users=clean.users.map(u=>{const x={...u};delete x.password;delete x.loginOtp;return x});
+    await supabase.from('app_state').upsert({id:1,state:clean,updated_by:session.user.id,updated_at:new Date().toISOString()});
   }catch(err){console.warn('Cloud sync failed',err)}
 }
 async function loadCloudState(){
@@ -1982,10 +1997,18 @@ function renderOwner(){
  $('owner-outlet-matrix-body').innerHTML=ownerOutlets().length?ownerOutlets().map(o=>{let us=users.filter(u=>u.outlets==='ALL'||(u.outlets||[]).includes(o.id));return `<tr><td><b>${esc(o.name)}</b></td><td>${esc(o.code)}</td><td>${esc(o.city||'')}</td><td>${us.length?esc(us.map(u=>u.name).join(', ')):'<span class="owner-muted">No users assigned</span>'}</td><td>${us.filter(u=>u.status==='Active').length}</td></tr>`}).join(''):`<tr><td colspan="5" class="empty-state">No outlets registered.</td></tr>`;
 }
 function saveOwnerSettings(){state.ownerSettings=Object.assign({},state.ownerSettings,{orgName:$('owner-org-name').value.trim(),ownerName:$('owner-name').value.trim(),email:$('owner-email').value.trim(),phone:$('owner-phone').value.trim(),address:$('owner-address').value.trim()});save();toast('Organisation settings saved')}
-function openOwnerUserModal(){resetForm('form-owner-user');$('owner-user-id').value='';$('owner-user-modal-title').innerHTML='<span>👤</span> Add Organisation User';$('ou-password').value='';$('ou-login-otp').value='';renderOwnerUserFields();openModal('modal-owner-user')}
+function openOwnerUserModal(){resetForm('form-owner-user');$('owner-user-id').value='';$('owner-user-modal-title').innerHTML='<span>👤</span> Add Organisation User';$('ou-password').value='';$('ou-password').required=true;renderOwnerUserFields();openModal('modal-owner-user')}
 function renderOwnerUserFields(user){const boxes=$('owner-outlet-checkboxes');boxes.innerHTML=ownerOutlets().length?ownerOutlets().map(o=>`<label><input type="checkbox" value="${esc(o.id)}" ${user&&user.outlets!=='ALL'&&(user.outlets||[]).includes(o.id)?'checked':''}> ${esc(o.name)}</label>`).join(''):'<span class="owner-muted">Add an outlet first.</span>';if(user?.outlets==='ALL')boxes.querySelectorAll('input').forEach(x=>x.checked=true);let ps=new Set(user?.permissions||[]);qsa('#owner-permission-checkboxes input').forEach(x=>x.checked=ps.has(x.value));}
-function editOwnerUser(id){let u=state.users.find(x=>x.id===id);if(!u)return;$('owner-user-id').value=u.id;$('owner-user-modal-title').innerHTML='<span>👤</span> Edit Organisation User';$('ou-name').value=u.name;$('ou-email').value=u.email;$('ou-password').value='';$('ou-login-otp').value=u.loginOtp||'';$('ou-role').value=u.role;$('ou-status').value=u.status;renderOwnerUserFields(u);openModal('modal-owner-user')}
-function deleteOwnerUser(id){if(id==='u-owner')return;if(!confirm('Delete this organisation user?'))return;state.users=state.users.filter(u=>u.id!==id);save();toast('User removed')}
+function editOwnerUser(id){let u=state.users.find(x=>x.id===id);if(!u)return;$('owner-user-id').value=u.id;$('owner-user-modal-title').innerHTML='<span>👤</span> Edit Organisation User';$('ou-name').value=u.name;$('ou-email').value=u.email;$('ou-password').value='';$('ou-role').value=u.role;$('ou-status').value=u.status;renderOwnerUserFields(u);openModal('modal-owner-user')}
+function deleteOwnerUser(id){
+  if(id==='u-owner'){toast('The primary Owner cannot be deleted','error');return}
+  const u=state.users.find(x=>x.id===id);
+  if(!u)return;
+  if(!confirm('Delete this organisation user from the organisation access list?\n\nThis removes their access profile.'))return;
+  state.users=state.users.filter(x=>x.id!==id);
+  save();
+  toast('User removed from organisation access');
+}
 function exportUsersCSV(){exportCSV([['Name','Email','Role','Status','Assigned Outlets','Permissions'],...(state.users||[]).map(u=>[u.name,u.email,u.role,u.status,u.outlets==='ALL'?'All outlets':(u.outlets||[]).map(id=>ownerOutlets().find(o=>o.id===id)?.name||id).join(' | '),(u.permissions||[]).join(' | ')])],'owner-users.csv')}
 
 function ensureLoginUsers(){
@@ -2126,7 +2149,79 @@ function resetToDemoData(){openProtectedReset()}
 function handleImportJSON(e){let f=e.target.files?.[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.items||!x.txns)throw Error('Invalid backup');state=Object.assign(demo(),x);save();toast('Database restored')}catch(err){toast('Invalid JSON backup','error')}};r.readAsText(f)}
 function handleImportItemMasterCSV(e){let f=e.target.files?.[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let lines=r.result.split(/\r?\n/).filter(Boolean);let head=lines.shift().split(',').map(x=>x.replace(/^"|"$/g,''));let idx={};head.forEach((h,i)=>idx[h.trim()]=i);let added=0;for(const line of lines){let cols=line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,''));let sku=cols[idx.SKU_Code];if(!sku)continue;let ex=state.items.find(i=>i.sku===sku);let obj={id:ex?.id||uid('ITEM'),sku,name:cols[idx.Item_Name]||sku,category:cols[idx.Category]||'Green Coffee',uom:cols[idx.UOM]||'kg',loss:num(cols[idx.Target_Roasting_Loss_Pct]),cost:num(cols[idx.Cost_Price]),price:num(cols[idx.Selling_Price]),reorder:num(cols[idx.Reorder_Level]),origin:cols[idx.Origin]||''};if(ex)Object.assign(ex,obj);else state.items.push(obj);added++}save();toast(added+' items imported')}catch(err){toast('CSV import failed','error')}};r.readAsText(f)}
 function submit(id,fn){$(id)?.addEventListener('submit',e=>{e.preventDefault();try{fn();}catch(err){console.error(err);toast(err.message||'Unable to save','error')}})}
-submit('form-owner-user',()=>{let id=$('owner-user-id').value.trim(),name=$('ou-name').value.trim(),email=$('ou-email').value.trim(),password=$('ou-password').value,loginOtp=String($('ou-login-otp').value||'').trim(); if(!name||!email)throw Error('Name and email are required'); if(loginOtp && !/^\d{6}$/.test(loginOtp))throw Error('Login OTP must be exactly 6 digits');let outlets=Array.from(document.querySelectorAll('#owner-outlet-checkboxes input:checked')).map(x=>x.value);let permissions=Array.from(document.querySelectorAll('#owner-permission-checkboxes input:checked')).map(x=>x.value);if(!permissions.length)throw Error('Select at least one permission');let ex=state.users.find(x=>x.id===id);if(ex){ex.name=name;ex.email=email;ex.role=$('ou-role').value;ex.status=$('ou-status').value;ex.outlets=outlets.length===ownerOutlets().length?'ALL':outlets;ex.permissions=permissions;if(ex.role==='Owner')ex.outlets='ALL';if(password.trim())ex.password=password.trim(); if(loginOtp)ex.loginOtp=loginOtp;}else{let u={id:uid('USER'),name,email,password:password.trim(),loginOtp:loginOtp||String(Math.floor(100000+Math.random()*900000)),role:$('ou-role').value,status:$('ou-status').value,outlets:outlets.length===ownerOutlets().length?'ALL':outlets,permissions};if(u.role==='Owner')u.outlets='ALL';state.users.push(u)}closeModal('modal-owner-user');save();toast(id?'User updated':'User created')});
+submit('form-owner-user',async()=>{
+  const id=$('owner-user-id').value.trim();
+  const name=$('ou-name').value.trim();
+  const email=$('ou-email').value.trim().toLowerCase();
+  const password=$('ou-password').value;
+  if(!name||!email)throw Error('Name and email are required');
+
+  const outlets=Array.from(document.querySelectorAll('#owner-outlet-checkboxes input:checked')).map(x=>x.value);
+  const permissions=Array.from(document.querySelectorAll('#owner-permission-checkboxes input:checked')).map(x=>x.value);
+  if(!permissions.length)throw Error('Select at least one permission');
+
+  const role=$('ou-role').value;
+  const status=$('ou-status').value;
+  const ex=state.users.find(x=>x.id===id);
+
+  if(ex){
+    // Editing updates the organisation profile. Password changes are handled by the user's own Change Password flow.
+    ex.name=name;
+    ex.email=email;
+    ex.role=role;
+    ex.status=status;
+    ex.outlets=(role==='Owner'||outlets.length===ownerOutlets().length)?'ALL':outlets;
+    ex.permissions=permissions;
+    delete ex.password;
+    delete ex.loginOtp;
+    closeModal('modal-owner-user');
+    save();
+    toast('User profile updated');
+    return;
+  }
+
+  if(!password || password.length<6)throw Error('Set an initial password of at least 6 characters');
+
+  // Create the actual Supabase Auth account so the new user can sign in.
+  const {data:{session:ownerSession}}=await supabase.auth.getSession();
+  if(!ownerSession)throw Error('Owner session expired. Please sign in again.');
+
+  const {data,error}=await supabase.auth.signUp({
+    email,
+    password,
+    options:{data:{name,role}}
+  });
+  if(error)throw Error(error.message||'Unable to create login account');
+
+  // signUp can change the active session when email confirmation is disabled.
+  // Restore the Owner session immediately so the Owner stays logged in.
+  if(ownerSession?.access_token&&ownerSession?.refresh_token){
+    await supabase.auth.setSession({
+      access_token:ownerSession.access_token,
+      refresh_token:ownerSession.refresh_token
+    });
+  }
+
+  const authId=data?.user?.id||uid('AUTH');
+  const u={
+    id:authId,
+    authUserId:authId,
+    name,email,
+    role,
+    status,
+    outlets:(role==='Owner'||outlets.length===ownerOutlets().length)?'ALL':outlets,
+    permissions
+  };
+  state.users.push(u);
+  closeModal('modal-owner-user');
+  save();
+
+  if(data?.user && !data.session){
+    toast('User created. Ask the user to confirm their email before first login.');
+  }else{
+    toast('User created successfully');
+  }
+});
 submit('form-green-purchase',()=>{let d=validTxnDate($('gp-date').value,'Purchase Date'),sku=$('gp-sku').value,q=num($('gp-qty').value),g=state.greenLots.find(x=>x.sku===sku&&x.lot===($('gp-lot').value||'NO-LOT'));if(g){g.purchases+=q;g.cost=num($('gp-cost').value)||g.cost}else{g={id:uid('LOT'),sku,lot:$('gp-lot').value||('LOT-'+new Date().getFullYear()+'-'+Date.now().toString().slice(-4)),supplier:$('gp-supplier').value||'',opening:0,purchases:q,issued:0,physical:q,cost:num($('gp-cost').value)||num(item(sku)?.cost)};state.greenLots.push(g)}log('PURCHASE','Green Coffee',sku,q,g.lot,$('gp-supplier').value,d);closeModal('modal-green-purchase');save();toast('Green coffee purchase recorded')});
 submit('form-issue-roastery',()=>{let d=validTxnDate($('ir-date').value,'Issue Date'),sku=$('ir-sku').value,q=num($('ir-qty').value),g=state.greenLots.find(x=>x.sku===sku);if(!g||greenBalance(g)<q)throw Error('Insufficient green coffee stock');g.issued+=q;log('ISSUE_TO_ROASTERY','Green Coffee',sku,q,'ROASTERY',$('ir-notes').value,d);closeModal('modal-issue-roastery');save();toast('Green coffee issued to roastery')});
 submit('form-roast-batch',()=>{let rd=validTxnDate($('rb-date').value,'Roast Date'),td=validTxnDate($('rb-transfer-date').value,'Transfer to Packing Date');if(td<rd)throw Error('Transfer to Packing Date cannot be before Roast Date');let gs=$('rb-green-sku').value,rs=$('rb-roasted-sku').value,gin=num($('rb-green-in').value),out=num($('rb-roasted-out').value);if(out>gin)throw Error('Roasted output cannot exceed green input');let g=state.greenLots.find(x=>x.sku===gs);if(!g||greenBalance(g)<gin)throw Error('Insufficient staged green coffee');let r={id:uid('ROAST'),batch:'RB-'+rd.replace(/-/g,'')+'-'+String(state.roasts.length+1).padStart(3,'0'),date:dateToISO(rd),transferDate:td,entryAt:now(),greenSku:gs,roastedSku:rs,greenIn:gin,roastedOut:out,machine:$('rb-machine').value,profile:$('rb-profile').value,notes:$('rb-notes').value};state.roasts.push(r);state.packing[rs] ||= {opening:0,receiving:0,issued:0,physical:0};state.packing[rs].receiving+=out;state.packing[rs].physical+=out;log('ROAST_COMPLETE','Roastery',gs,gin,rs,'Roast date '+rd+'; output '+out+' kg; loss '+(gin-out).toFixed(2)+' kg',rd);log('TRANSFER_TO_PACKING','Packing',rs,out,'PACKING','Transferred from Roastery on '+td,td);closeModal('modal-new-roast');save();toast('Roast batch and packing transfer recorded')});
