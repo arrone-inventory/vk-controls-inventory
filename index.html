@@ -438,11 +438,21 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
           <span>Outlets &amp; Depts</span>
           <span class="nav-badge" style="background:rgba(212,163,115,0.2);color:var(--crema-primary);">+Cafes</span>
         </button>
-        <button class="nav-btn" id="nav-reports" onclick="window.CoffeeApp.switchTab('reports')">
+        <button class="nav-btn" id="nav-reports" onclick="window.CoffeeApp.toggleReportNav()">
           <span class="nav-icon">📊</span>
-          <span>Board Reports</span>
-          <span class="nav-badge">Reports</span>
+          <span>Reports</span>
+          <span class="nav-badge">⌄</span>
         </button>
+        <div class="nav-subgroup report-nav-subgroup" id="report-nav-subgroup">
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('PURCHASE')"><span>📥</span><span>Purchase Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('ISSUE')"><span>📤</span><span>Issue Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('TRANSFER')"><span>🔄</span><span>Transfer Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('ROASTING')"><span>🔥</span><span>Roasting Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('WASTAGE')"><span>⚠️</span><span>Wastage Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('OPENING')"><span>📦</span><span>Opening Stock Reports</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('CLOSING')"><span>📊</span><span>Closing &amp; Variance</span></button>
+          <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('BOARD')"><span>📋</span><span>Board Summary</span></button>
+        </div>
         <button class="nav-btn" id="nav-ledger" onclick="window.CoffeeApp.switchTab('ledger')">
           <span class="nav-icon">📜</span>
           <span>Audit Ledger</span>
@@ -899,6 +909,9 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
                   <span class="search-icon">🔍</span>
                   <input type="text" id="green-search-input" class="search-input" placeholder="Search Green SKU, Lot, Origin..." />
                 </div>
+                <button class="topbar-btn" onclick="window.CoffeeApp.openOpeningStockModal('Green Coffee')">
+                  <span>📦</span> <span>+ Opening Stock</span>
+                </button>
                 <button class="topbar-btn" onclick="window.CoffeeApp.openGreenPurchaseModal()">
                   <span>📥</span> <span>+ Receive Purchase</span>
                 </button>
@@ -980,6 +993,9 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
                   <span class="search-icon">🔍</span>
                   <input type="text" id="roastery-search-input" class="search-input" placeholder="Search Batch, Green SKU, Profile..." />
                 </div>
+                <button class="topbar-btn" onclick="window.CoffeeApp.openOpeningStockModal('Roastery')">
+                  <span>📦</span> <span>+ Opening Stock</span>
+                </button>
                 <button class="topbar-btn primary" onclick="window.CoffeeApp.openNewRoastModal()">
                   <span>🔥</span> <span>+ Record Roast Batch</span>
                 </button>
@@ -1038,6 +1054,9 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
                   <span class="search-icon">🔍</span>
                   <input type="text" id="packing-search-input" class="search-input" placeholder="Search Packaged SKU..." />
                 </div>
+                <button class="topbar-btn" onclick="window.CoffeeApp.openOpeningStockModal('Packing')">
+                  <span>📦</span> <span>+ Opening Stock</span>
+                </button>
                 <button class="topbar-btn primary" onclick="window.CoffeeApp.openModal('modal-packing-issue')">
                   <span>📤</span> <span>+ Issue to Dept / Party</span>
                 </button>
@@ -1102,6 +1121,9 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
                   <span class="search-icon">🔍</span>
                   <input type="text" id="retail-search-input" class="search-input" placeholder="Search Retail / Packaging SKU..." />
                 </div>
+                <button class="topbar-btn" onclick="window.CoffeeApp.openOpeningStockModal('Retail')">
+                  <span>📦</span> <span>+ Opening Stock</span>
+                </button>
                 <button class="topbar-btn" onclick="window.CoffeeApp.openRetailPurchaseModal()">
                   <span>📥</span> <span>+ Receive Purchase</span>
                 </button>
@@ -1316,7 +1338,7 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
               <div class="form-group"><label class="form-label">Month</label><input type="month" id="report-month" class="form-control"></div>
               <div class="form-group"><label class="form-label">From Date</label><input type="date" id="report-from" class="form-control"></div>
               <div class="form-group"><label class="form-label">To Date</label><input type="date" id="report-to" class="form-control"></div>
-              <div class="form-group"><label class="form-label">Report Scope</label><select id="report-scope" class="form-control"><option value="ALL">All Inventory &amp; Coffee Operations</option><option value="GREEN">Green Coffee</option><option value="ROAST">Roasting &amp; Transfers</option><option value="PACKING">Packing &amp; Department Issues</option><option value="RETAIL">Retail &amp; Packaging</option></select></div>
+              <div class="form-group"><label class="form-label">Inventory Scope</label><select id="report-inventory-scope" class="form-control"><option value="ALL">All Inventory &amp; Coffee Operations</option><option value="GREEN">Green Coffee</option><option value="ROAST">Roasting &amp; Transfers</option><option value="PACKING">Packing &amp; Department Issues</option><option value="RETAIL">Retail &amp; Packaging</option></select></div>
             </div>
             <div class="report-filter-note">Use <b>Month + Apply Month</b> for a board month-end report, or enter any From/To dates for daily / custom-period reporting. Physical closing uses the latest recorded physical count on or before the report end date.</div>
           </div>
@@ -1329,6 +1351,11 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
             <div class="report-kpi"><span>Wastage</span><strong id="report-kpi-waste">0.0 kg</strong><small>Department loss movements</small></div>
             <div class="report-kpi"><span>Variance Flags</span><strong id="report-kpi-variance">0</strong><small>Closing vs physical</small></div>
           </div>
+
+          <section class="table-container-card report-section report-detail-section">
+            <div class="report-section-head"><div><h2 class="table-heading" id="report-detail-title">📥 Purchase Report</h2><div class="owner-muted" id="report-detail-note">Detailed transactions for the selected period.</div></div></div>
+            <div class="data-table-responsive"><table class="modern-table"><thead id="report-detail-head"></thead><tbody id="report-detail-body"></tbody></table></div>
+          </section>
 
           <section class="table-container-card report-section">
             <div class="report-section-head"><div><h2 class="table-heading">📦 Purchase / Issue / Transfer Summary</h2><div class="owner-muted">Movement totals for the selected dates.</div></div></div>
@@ -1557,6 +1584,66 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
       </div>
     </main>
 
+  </div>
+
+  <!-- ====================================================================
+       MODAL 0: OPENING STOCK
+       ==================================================================== -->
+  <div class="modal-overlay" id="modal-opening-stock">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title"><span>📦</span> Add Opening Stock</div>
+        <button class="modal-close-btn" onclick="window.CoffeeApp.closeModal('modal-opening-stock')">&times;</button>
+      </div>
+      <form id="form-opening-stock">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Department / Module</label>
+              <select id="os-module" class="form-control" required>
+                <option value="Green Coffee">Green Coffee</option>
+                <option value="Roastery">Roastery Unit</option>
+                <option value="Packing">Packing</option>
+                <option value="Retail">Retail</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Opening Date</label>
+              <input type="date" id="os-date" class="form-control txn-date" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SKU / Item</label>
+            <select id="os-sku" class="form-control" required></select>
+          </div>
+          <div class="form-row" id="os-green-extra">
+            <div class="form-group">
+              <label class="form-label">Lot / Batch Number</label>
+              <input type="text" id="os-lot" class="form-control" placeholder="e.g. OPEN-2026-001" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Supplier / Origin</label>
+              <input type="text" id="os-supplier" class="form-control" placeholder="Opening stock supplier / origin" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Opening Quantity</label>
+              <input type="number" step="0.1" min="0.1" id="os-qty" class="form-control" placeholder="e.g. 500" required />
+            </div>
+            <div class="form-group" id="os-green-cost-wrap">
+              <label class="form-label">Unit Cost (₹/kg)</label>
+              <input type="number" step="0.01" min="0" id="os-cost" class="form-control" placeholder="e.g. 620" />
+            </div>
+          </div>
+          <div class="form-hint">Opening stock is the starting balance. It is recorded separately from purchases and issues and does not change existing transaction history.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="topbar-btn" onclick="window.CoffeeApp.closeModal('modal-opening-stock')">Cancel</button>
+          <button type="submit" class="topbar-btn primary">Save Opening Stock</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- ====================================================================
@@ -2242,7 +2329,7 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.mobile-open{transform:translateX(0)}.main-wrapper{margin-left:0}.mobile-menu-toggle{display:inline-block;background:none;border:0;color:#fff;font-size:22px;margin-right:8px}.topbar{height:auto;padding:12px;gap:10px;align-items:flex-start}.topbar-right{display:none}.content-body{padding:12px}.kpi-grid,.executive-metrics-grid,.executive-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.flow-stages-grid{grid-template-columns:1fr}.dept-breakdown-grid{grid-template-columns:1fr}.table-toolbar{align-items:flex-start;flex-direction:column}.search-input{width:140px}}
 
 /* BOARD REPORTS — clean white/light-green reporting language */
-.report-header-card{padding:1.5rem;margin-bottom:1.25rem}.report-head-row{display:flex;justify-content:space-between;gap:1.25rem;align-items:flex-start}.report-title{margin:.2rem 0 .35rem;font-size:1.55rem;color:#0b3327}.report-subtitle{margin:0;color:#587067;font-size:.88rem}.report-actions{display:flex;gap:.6rem;flex-wrap:wrap}.report-filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.35fr;gap:1rem;margin-top:1.25rem}.report-filter-note{margin-top:.75rem;padding:.75rem .9rem;border-radius:10px;background:#eef6f2;border:1px solid #d5e6de;color:#49635a;font-size:.76rem}.report-kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.25rem}.report-kpi{background:#fff;border:1px solid #d9e4df;border-radius:14px;padding:1rem;box-shadow:0 4px 14px rgba(12,58,45,.05)}.report-kpi span{display:block;color:#587067;font-size:.76rem}.report-kpi strong{display:block;color:#0b6b4f;font-size:1.35rem;margin:.35rem 0}.report-kpi small{color:#7a8983;font-size:.68rem}.report-section{margin-bottom:1.25rem}.report-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}.report-section .table-heading{color:#0b3327}.report-section .owner-muted{color:#71817b}@media(max-width:1100px){.report-kpi-grid{grid-template-columns:repeat(3,1fr)}.report-filter-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.report-head-row{flex-direction:column}.report-filter-grid{grid-template-columns:1fr}.report-kpi-grid{grid-template-columns:1fr 1fr}}
+.report-center-card{margin-bottom:1.25rem}.report-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}.report-type-card{border:1px solid #d9e4df;background:#fff;border-radius:12px;padding:.9rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.2rem;transition:.15s ease}.report-type-card:hover{border-color:#0b8a68;transform:translateY(-1px)}.report-type-card.active{border-color:#0b8a68;box-shadow:0 0 0 2px rgba(11,138,104,.12);background:#eef8f4}.report-type-card span{font-size:1.15rem}.report-type-card strong{color:#0b3327;font-size:.85rem}.report-type-card small{color:#71817b;font-size:.68rem}.report-detail-section{margin-bottom:1.25rem}.report-nav-subgroup{margin-top:-.15rem;margin-bottom:.35rem;max-height:0;overflow:hidden;opacity:0;transition:max-height .18s ease,opacity .18s ease}.report-nav-subgroup.open{max-height:420px;opacity:1}.report-nav-subgroup .nav-sub-btn{font-size:.78rem;padding:.42rem .55rem}.report-nav-subgroup .nav-sub-btn span:first-child{width:1rem}@media(max-width:1100px){.report-type-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.report-type-grid{grid-template-columns:1fr 1fr}}.report-header-card{padding:1.5rem;margin-bottom:1.25rem}.report-head-row{display:flex;justify-content:space-between;gap:1.25rem;align-items:flex-start}.report-title{margin:.2rem 0 .35rem;font-size:1.55rem;color:#0b3327}.report-subtitle{margin:0;color:#587067;font-size:.88rem}.report-actions{display:flex;gap:.6rem;flex-wrap:wrap}.report-filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.35fr;gap:1rem;margin-top:1.25rem}.report-filter-note{margin-top:.75rem;padding:.75rem .9rem;border-radius:10px;background:#eef6f2;border:1px solid #d5e6de;color:#49635a;font-size:.76rem}.report-kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.25rem}.report-kpi{background:#fff;border:1px solid #d9e4df;border-radius:14px;padding:1rem;box-shadow:0 4px 14px rgba(12,58,45,.05)}.report-kpi span{display:block;color:#587067;font-size:.76rem}.report-kpi strong{display:block;color:#0b6b4f;font-size:1.35rem;margin:.35rem 0}.report-kpi small{color:#7a8983;font-size:.68rem}.report-section{margin-bottom:1.25rem}.report-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}.report-section .table-heading{color:#0b3327}.report-section .owner-muted{color:#71817b}@media(max-width:1100px){.report-kpi-grid{grid-template-columns:repeat(3,1fr)}.report-filter-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.report-head-row{flex-direction:column}.report-filter-grid{grid-template-columns:1fr}.report-kpi-grid{grid-template-columns:1fr 1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -2274,13 +2361,14 @@ function demo(){
  {id:'g1',sku:'GC-KEN-AA',lot:'LOT-KEN-2609',supplier:'Attikan Estate',opening:120,purchases:500,issued:210,physical:404,cost:620},
  {id:'g2',sku:'GC-ETH-YRG',lot:'LOT-ETH-2608',supplier:'Coorg Importers',opening:80,purchases:300,issued:170,physical:208,cost:720}],
  roasts:[{id:'r1',batch:'RB-2609-001',date:now(),greenSku:'GC-KEN-AA',roastedSku:'RC-KEN-FLT',greenIn:30,roastedOut:25.5,machine:'Giesen W15',profile:'Filter Light',notes:'Demo batch'}],
+ roasteryOpening:{'RC-KEN-FLT':{opening:0,physical:null}},
  packing:{'PK-ESP-250':{opening:120,receiving:80,issued:100,physical:96},'RC-KEN-FLT':{opening:20,receiving:25.5,issued:10,physical:35.2}},
  retail:{'PM-POUCH-250':{opening:500,receiving:1000,issued:700,physical:780},'RM-DRIP-01':{opening:20,receiving:10,issued:8,physical:22}},
  departments:[{id:'d1',code:'OUT-BLR-IND',name:'Indiranagar Cafe',type:'Outlet',role:'Cafe Outlet'},{id:'d2',code:'OUT-BOM-BND',name:'Bandra Outlet',type:'Outlet',role:'Cafe Outlet'},{id:'d3',code:'WEB-D2C',name:'Website Sales (D2C)',type:'Website',role:'E-Commerce'},{id:'d4',code:'B2B-WHOLE',name:'B2B Wholesale',type:'B2B',role:'Wholesale'},{id:'d5',code:'WASTE',name:'Wastage',type:'Wastage',role:'Loss'},{id:'d6',code:'GRIND-LOSS',name:'Grinder Loss',type:'Grinder Loss',role:'Loss'},{id:'d7',code:'QA-LAB',name:'Lab Testing',type:'Lab',role:'Quality Assurance'}],
  outlets:[{id:'o1',code:'OUT-BLR-IND',name:'Indiranagar Cafe',city:'Bengaluru',format:'Dine-in Cafe & Roastery',manager:'Store Manager',address:'Indiranagar'}],
  txns:[{id:uid('TXN'),date:now(),module:'Green Coffee',type:'PURCHASE',sku:'GC-KEN-AA',qty:500,ref:'LOT-KEN-2609',notes:'Demo purchase'}],ownerSettings:{orgName:'Coffee & Retails',ownerName:'Main Owner',email:'',phone:'',address:'',resetOtp:''},users:[{id:'u-owner',name:'Main Owner',email:'owner@local',password:'owner123',role:'Owner',status:'Active',outlets:'ALL',permissions:['Dashboard','Inventory','Purchasing','Roastery','Reports','Import/Export','User Access']}]};
 }
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);return Object.assign(demo(),x)} }catch(e){} return demo()}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const x=Object.assign(demo(),JSON.parse(raw));x.roasteryOpening ||= {};return x}}catch(e){} const x=demo();x.roasteryOpening ||= {};return x}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function toast(msg,type='success'){const old=$('toastNotification');old.className='toast '+type;old.textContent=msg;old.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>old.style.display='none',2600)}
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
@@ -2320,29 +2408,98 @@ function txnsBefore(date,types,module,sku){return state.txns.filter(t=>{
 function latestPhysical(module,sku,to){let rows=state.txns.filter(t=>t.type==='PHYSICAL_COUNT'&&t.module===module&&t.sku===sku&&(t.businessDate||String(t.date||'').slice(0,10))<=to).sort((a,b)=>(b.businessDate||'').localeCompare(a.businessDate||''));return rows.length?num(rows[0].qty):null}
 function reportRowsForClosing(from,to){
   const rows=[];
-  if($('report-scope')?.value==='ALL'||$('report-scope')?.value==='GREEN') state.greenLots.forEach(g=>{
-    const preP=txnsBefore(from,['PURCHASE'],'Green Coffee',g.sku).reduce((a,t)=>a+num(t.qty),0),preI=txnsBefore(from,['ISSUE_TO_ROASTERY'],'Green Coffee',g.sku).reduce((a,t)=>a+num(t.qty),0);
-    const p=periodTxns(from,to).filter(t=>t.module==='Green Coffee'&&t.type==='PURCHASE'&&t.sku===g.sku).reduce((a,t)=>a+num(t.qty),0),o=periodTxns(from,to).filter(t=>t.module==='Green Coffee'&&t.type==='ISSUE_TO_ROASTERY'&&t.sku===g.sku).reduce((a,t)=>a+num(t.qty),0);
-    const opening=num(g.opening)+preP-preI, closing=opening+p-o, physical=latestPhysical('Green Coffee',g.sku,to); rows.push({module:'Green Coffee',sku:g.sku,item:item(g.sku)?.name||g.sku,uom:'kg',opening,inQty:p,outQty:o,closing,physical,variance:physical===null?null:physical-closing});
-  });
-  if($('report-scope')?.value==='ALL'||$('report-scope')?.value==='ROAST'||$('report-scope')?.value==='PACKING') Object.entries(state.packing).forEach(([sku,x])=>{
+  const scope=$('report-inventory-scope')?.value||'ALL';
+  const tx=periodTxns(from,to);
+  if(scope==='ALL'||scope==='GREEN'){
+    const skuSet=[...new Set(state.greenLots.map(g=>g.sku))];
+    skuSet.forEach(sku=>{
+      const baseOpening=state.greenLots.filter(g=>g.sku===sku).reduce((a,g)=>a+num(g.opening),0);
+      const preP=txnsBefore(from,['PURCHASE'],'Green Coffee',sku).reduce((a,t)=>a+num(t.qty),0),preI=txnsBefore(from,['ISSUE_TO_ROASTERY'],'Green Coffee',sku).reduce((a,t)=>a+num(t.qty),0);
+      const p=tx.filter(t=>t.module==='Green Coffee'&&t.type==='PURCHASE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0),o=tx.filter(t=>t.module==='Green Coffee'&&t.type==='ISSUE_TO_ROASTERY'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0);
+      const opening=baseOpening+preP-preI, closing=opening+p-o, physical=latestPhysical('Green Coffee',sku,to);
+      rows.push({module:'Green Coffee',sku,item:item(sku)?.name||sku,uom:'kg',opening,inQty:p,outQty:o,closing,physical,variance:physical===null?null:physical-closing});
+    });
+  }
+  if(scope==='ALL'||scope==='ROAST'){
+    state.roasteryOpening ||= {};
+    const skuSet=[...new Set([...Object.keys(state.roasteryOpening),...state.roasts.map(r=>r.roastedSku)])];
+    skuSet.forEach(sku=>{
+      const base=num(state.roasteryOpening[sku]?.opening), preIn=state.roasts.filter(r=>String(r.date).slice(0,10)<from&&r.roastedSku===sku).reduce((a,r)=>a+num(r.roastedOut),0), preOut=state.roasts.filter(r=>(r.transferDate||String(r.date).slice(0,10))<from&&r.roastedSku===sku).reduce((a,r)=>a+num(r.roastedOut),0);
+      const inQty=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to&&r.roastedSku===sku).reduce((a,r)=>a+num(r.roastedOut),0), outQty=state.roasts.filter(r=>(r.transferDate||String(r.date).slice(0,10))>=from&&(r.transferDate||String(r.date).slice(0,10))<=to&&r.roastedSku===sku).reduce((a,r)=>a+num(r.roastedOut),0);
+      const opening=base+preIn-preOut,closing=opening+inQty-outQty,physical=null;
+      rows.push({module:'Roastery',sku,item:item(sku)?.name||sku,uom:item(sku)?.uom||'kg',opening,inQty,outQty,closing,physical,variance:null});
+    });
+  }
+  if(scope==='ALL'||scope==='PACKING') Object.entries(state.packing).forEach(([sku,x])=>{
     const preIn=txnsBefore(from,['TRANSFER_TO_PACKING'],'Packing',sku).reduce((a,t)=>a+num(t.qty),0),preOut=txnsBefore(from,['DEPT_ISSUE'],'Packing',sku).reduce((a,t)=>a+num(t.qty),0);
-    const p=periodTxns(from,to).filter(t=>t.module==='Packing'&&t.type==='TRANSFER_TO_PACKING'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0),o=periodTxns(from,to).filter(t=>t.module==='Packing'&&t.type==='DEPT_ISSUE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0);
+    const p=tx.filter(t=>t.module==='Packing'&&t.type==='TRANSFER_TO_PACKING'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0),o=tx.filter(t=>t.module==='Packing'&&t.type==='DEPT_ISSUE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0);
     const opening=num(x.opening)+preIn-preOut, closing=opening+p-o, physical=latestPhysical('Packing',sku,to); rows.push({module:'Packing',sku,item:item(sku)?.name||sku,uom:item(sku)?.uom||'kg',opening,inQty:p,outQty:o,closing,physical,variance:physical===null?null:physical-closing});
   });
-  if($('report-scope')?.value==='ALL'||$('report-scope')?.value==='RETAIL') Object.entries(state.retail).forEach(([sku,x])=>{
+  if(scope==='ALL'||scope==='RETAIL') Object.entries(state.retail).forEach(([sku,x])=>{
     const preIn=txnsBefore(from,['PURCHASE'],'Retail',sku).reduce((a,t)=>a+num(t.qty),0),preOut=txnsBefore(from,['DEPT_ISSUE'],'Retail',sku).reduce((a,t)=>a+num(t.qty),0);
-    const p=periodTxns(from,to).filter(t=>t.module==='Retail'&&t.type==='PURCHASE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0),o=periodTxns(from,to).filter(t=>t.module==='Retail'&&t.type==='DEPT_ISSUE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0);
+    const p=tx.filter(t=>t.module==='Retail'&&t.type==='PURCHASE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0),o=tx.filter(t=>t.module==='Retail'&&t.type==='DEPT_ISSUE'&&t.sku===sku).reduce((a,t)=>a+num(t.qty),0);
     const opening=num(x.opening)+preIn-preOut, closing=opening+p-o, physical=latestPhysical('Retail',sku,to); rows.push({module:'Retail',sku,item:item(sku)?.name||sku,uom:item(sku)?.uom||'kg',opening,inQty:p,outQty:o,closing,physical,variance:physical===null?null:physical-closing});
   });
   return rows;
+}
+let activeReportView='PURCHASE';
+function setReportViewUI(view){
+  activeReportView=view;
+  qsa('[data-report-view]').forEach(b=>b.classList.toggle('active',b.getAttribute('data-report-view')===view));
+  const titles={PURCHASE:'📥 Purchase Report',ISSUE:'📤 Issue Report',TRANSFER:'🔄 Transfer Report',ROASTING:'🔥 Roasting Report',WASTAGE:'⚠️ Wastage Report',OPENING:'📦 Opening Stock Report',CLOSING:'📊 Closing & Variance Report',BOARD:'📋 Board Summary'};
+  const notes={PURCHASE:'Green coffee and retail/packaging purchases recorded in the selected period.',ISSUE:'Green coffee issued to Roastery plus Packing/Retail department issues.',TRANSFER:'Roastery → Packing transfer movements recorded from the transaction ledger.',ROASTING:'Roast batches with green input, roasted output and loss percentage.',WASTAGE:'Department issues posted to a department marked as Wastage.',OPENING:'Opening stock entries recorded separately from purchases and issues.',CLOSING:'Opening, period inflow, period outflow, system closing, physical count and variance.',BOARD:'Management summary combining movements, production and closing information.'};
+  if($('report-detail-title'))$('report-detail-title').textContent=titles[view]||titles.PURCHASE;
+  if($('report-detail-note'))$('report-detail-note').textContent=notes[view]||notes.PURCHASE;
+}
+function openReportView(view){toggleReportNav(true);switchTab('reports');setReportViewUI(view);renderReports();qsa('.report-nav-subgroup .nav-sub-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+view+"'")));window.scrollTo({top:0,behavior:'smooth'});}
+function renderReportDetail(from,to,tx,roasts,rows){
+  let head='',body='';
+  if(activeReportView==='PURCHASE'){
+    const a=tx.filter(t=>t.type==='PURCHASE'); head='<tr><th>Date</th><th>Module</th><th>SKU</th><th>Item</th><th class="col-number">Quantity</th><th>Reference</th><th>Notes</th></tr>';
+    body=a.length?a.map(t=>`<tr><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td>${esc(t.module)}</td><td><b>${esc(t.sku)}</b></td><td>${esc(item(t.sku)?.name||t.sku)}</td><td class="col-number">${qty(t.qty)}</td><td>${esc(t.ref)}</td><td>${esc(t.notes||'')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty-state">No purchase entries in selected period.</td></tr>';
+  } else if(activeReportView==='ISSUE'){
+    const a=tx.filter(t=>t.type==='ISSUE_TO_ROASTERY'||t.type==='DEPT_ISSUE'); head='<tr><th>Date</th><th>Issue Type</th><th>Module</th><th>SKU</th><th>Destination</th><th class="col-number">Quantity</th><th>Reference / Notes</th></tr>';
+    body=a.length?a.map(t=>`<tr><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td><b>${esc(t.type)}</b></td><td>${esc(t.module)}</td><td>${esc(t.sku)}</td><td>${esc(t.ref||'')}</td><td class="col-number">${qty(t.qty)}</td><td>${esc((t.notes||'').trim())}</td></tr>`).join(''):'<tr><td colspan="7" class="empty-state">No issue entries in selected period.</td></tr>';
+  } else if(activeReportView==='TRANSFER'){
+    const a=tx.filter(t=>t.type==='TRANSFER_TO_PACKING'); head='<tr><th>Date</th><th>SKU</th><th>Item</th><th>From</th><th>To</th><th class="col-number">Quantity</th><th>Notes</th></tr>';
+    body=a.length?a.map(t=>`<tr><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td><b>${esc(t.sku)}</b></td><td>${esc(item(t.sku)?.name||t.sku)}</td><td>Roastery</td><td>Packing</td><td class="col-number">${qty(t.qty)}</td><td>${esc(t.notes||'')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty-state">No transfer entries in selected period.</td></tr>';
+  } else if(activeReportView==='ROASTING'){
+    head='<tr><th>Date</th><th>Batch</th><th>Green SKU</th><th>Roasted SKU</th><th class="col-number">Green In</th><th class="col-number">Roasted Out</th><th class="col-number">Loss</th><th class="col-number">Loss %</th><th>Transfer Date</th></tr>';
+    body=roasts.length?roasts.map(r=>{let loss=num(r.greenIn)-num(r.roastedOut),pct=r.greenIn?loss/r.greenIn*100:0;return `<tr><td>${esc(String(r.date).slice(0,10))}</td><td><b>${esc(r.batch)}</b></td><td>${esc(r.greenSku)}</td><td>${esc(r.roastedSku)}</td><td class="col-number">${qty(r.greenIn)}</td><td class="col-number">${qty(r.roastedOut)}</td><td class="col-number">${qty(loss)}</td><td class="col-number">${pct.toFixed(1)}%</td><td>${esc(r.transferDate||'')}</td></tr>`}).join(''):'<tr><td colspan="9" class="empty-state">No roasting batches in selected period.</td></tr>';
+  } else if(activeReportView==='WASTAGE'){
+    const a=tx.filter(t=>t.type==='DEPT_ISSUE'&&state.departments.find(d=>d.code===t.ref)?.type==='Wastage'); head='<tr><th>Date</th><th>SKU</th><th>Item</th><th>Department</th><th class="col-number">Quantity</th><th>Reference</th><th>Notes</th></tr>';
+    body=a.length?a.map(t=>{let d=state.departments.find(x=>x.code===t.ref);return `<tr><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td><b>${esc(t.sku)}</b></td><td>${esc(item(t.sku)?.name||t.sku)}</td><td>${esc(d?.name||t.ref||'Wastage')}</td><td class="col-number">${qty(t.qty)}</td><td>${esc(t.ref||'')}</td><td>${esc(t.notes||'')}</td></tr>`}).join(''):'<tr><td colspan="7" class="empty-state">No wastage entries in selected period.</td></tr>';
+  } else if(activeReportView==='OPENING'){
+    const a=tx.filter(t=>t.type==='OPENING_STOCK'); head='<tr><th>Date</th><th>Module</th><th>SKU</th><th>Item</th><th class="col-number">Opening Qty</th><th>Reference</th><th>Notes</th></tr>';
+    body=a.length?a.map(t=>`<tr><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td>${esc(t.module)}</td><td><b>${esc(t.sku)}</b></td><td>${esc(item(t.sku)?.name||t.sku)}</td><td class="col-number">${qty(t.qty)}</td><td>${esc(t.ref||'')}</td><td>${esc(t.notes||'')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty-state">No opening stock entries in selected period.</td></tr>';
+  } else if(activeReportView==='CLOSING'){
+    head='<tr><th>Module</th><th>SKU</th><th>Item</th><th>UOM</th><th class="col-number">Opening</th><th class="col-number">In / Purchase</th><th class="col-number">Out / Issue</th><th class="col-number">Closing</th><th class="col-number">Physical</th><th class="col-number">Variance</th></tr>';
+    body=rows.length?rows.map(r=>`<tr><td>${esc(r.module)}</td><td><b>${esc(r.sku)}</b></td><td>${esc(r.item)}</td><td>${esc(r.uom)}</td><td class="col-number">${qty(r.opening)}</td><td class="col-number">${qty(r.inQty)}</td><td class="col-number">${qty(r.outQty)}</td><td class="col-number"><b>${qty(r.closing)}</b></td><td class="col-number">${r.physical===null?'—':qty(r.physical)}</td><td class="col-number ${r.variance!==null&&Math.abs(r.variance)>.05?'status-danger':'status-ok'}">${r.variance===null?'—':qty(r.variance)}</td></tr>`).join(''):'<tr><td colspan="10" class="empty-state">No closing balances for selected period.</td></tr>';
+  } else {
+    head='<tr><th>Report</th><th>Module</th><th class="col-number">Quantity</th><th>Details</th></tr>';
+    const p=tx.filter(t=>t.type==='PURCHASE').reduce((a,t)=>a+num(t.qty),0),i=tx.filter(t=>t.type==='DEPT_ISSUE').reduce((a,t)=>a+num(t.qty),0),ir=tx.filter(t=>t.type==='ISSUE_TO_ROASTERY').reduce((a,t)=>a+num(t.qty),0),tr=tx.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0),ro=roasts.reduce((a,r)=>a+num(r.roastedOut),0),wa=tx.filter(t=>t.type==='DEPT_ISSUE'&&state.departments.find(d=>d.code===t.ref)?.type==='Wastage').reduce((a,t)=>a+num(t.qty),0); const a=[['Purchase','All',p,'All purchase receipts'],['Issue to Roastery','Green Coffee',ir,'Green coffee issue'],['Department Issue','Packing/Retail',i,'Department issues'],['Transfer','Packing',tr,'Roastery to Packing'],['Roast Output','Roastery',ro,'Roasted beans created'],['Wastage','Wastage',wa,'Wastage movements']]; body=a.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td class="col-number">${qty(r[2])} kg</td><td>${r[3]}</td></tr>`).join('');
+  }
+  $('report-detail-head').innerHTML=head;$('report-detail-body').innerHTML=body;
+}
+function exportCurrentReportCSV(){
+  const {from,to}=reportDates(),tx=periodTxns(from,to),roasts=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to),rows=reportRowsForClosing(from,to);
+  let out=[],name='report';
+  if(activeReportView==='PURCHASE'){out=[['Date','Module','SKU','Item','Quantity','Reference','Notes'],...tx.filter(t=>t.type==='PURCHASE').map(t=>[t.businessDate||String(t.date||'').slice(0,10),t.module,t.sku,item(t.sku)?.name||t.sku,t.qty,t.ref,t.notes||''])];name='purchase-report';}
+  else if(activeReportView==='ISSUE'){out=[['Date','Issue Type','Module','SKU','Destination','Quantity','Notes'],...tx.filter(t=>t.type==='ISSUE_TO_ROASTERY'||t.type==='DEPT_ISSUE').map(t=>[t.businessDate||String(t.date||'').slice(0,10),t.type,t.module,t.sku,t.ref,t.qty,t.notes||''])];name='issue-report';}
+  else if(activeReportView==='TRANSFER'){out=[['Date','SKU','Item','From','To','Quantity','Notes'],...tx.filter(t=>t.type==='TRANSFER_TO_PACKING').map(t=>[t.businessDate||String(t.date||'').slice(0,10),t.sku,item(t.sku)?.name||t.sku,'Roastery','Packing',t.qty,t.notes||''])];name='transfer-report';}
+  else if(activeReportView==='ROASTING'){out=[['Date','Batch','Green SKU','Roasted SKU','Green In','Roasted Out','Loss','Loss %','Transfer Date'],...roasts.map(r=>{let loss=num(r.greenIn)-num(r.roastedOut);return [String(r.date).slice(0,10),r.batch,r.greenSku,r.roastedSku,r.greenIn,r.roastedOut,loss,r.greenIn?loss/r.greenIn*100:0,r.transferDate||'']})];name='roasting-report';}
+  else if(activeReportView==='WASTAGE'){out=[['Date','SKU','Item','Department','Quantity','Reference','Notes'],...tx.filter(t=>t.type==='DEPT_ISSUE'&&state.departments.find(d=>d.code===t.ref)?.type==='Wastage').map(t=>[t.businessDate||String(t.date||'').slice(0,10),t.sku,item(t.sku)?.name||t.sku,state.departments.find(d=>d.code===t.ref)?.name||t.ref,t.qty,t.ref,t.notes||''])];name='wastage-report';}
+  else if(activeReportView==='OPENING'){out=[['Date','Module','SKU','Item','Opening Qty','Reference','Notes'],...tx.filter(t=>t.type==='OPENING_STOCK').map(t=>[t.businessDate||String(t.date||'').slice(0,10),t.module,t.sku,item(t.sku)?.name||t.sku,t.qty,t.ref||'',t.notes||''])];name='opening-stock-report';}
+  else if(activeReportView==='CLOSING'){out=[['Module','SKU','Item','UOM','Opening','In/Purchase','Out/Issue','Closing','Physical','Variance'],...rows.map(r=>[r.module,r.sku,r.item,r.uom,r.opening,r.inQty,r.outQty,r.closing,r.physical??'',r.variance??''])];name='closing-variance-report';}
+  else {exportBoardReportCSV();return;}
+  exportCSV(out,`${name}-${from}-to-${to}.csv`);toast('Current report exported');
 }
 function renderReports(){
   if(!$('report-from'))return;
   const today=todayISO();
   if(!$('report-from').value)$('report-from').value=today.slice(0,8)+'01';
   if(!$('report-to').value)$('report-to').value=today;
-  const {from,to}=reportDates(), tx=periodTxns(from,to), scope=$('report-scope')?.value||'ALL';
+  const {from,to}=reportDates(), tx=periodTxns(from,to), scope=$('report-inventory-scope')?.value||'ALL';
   const purchase=tx.filter(t=>t.type==='PURCHASE').reduce((a,t)=>a+num(t.qty),0), issue=tx.filter(t=>t.type==='DEPT_ISSUE').reduce((a,t)=>a+num(t.qty),0), transfer=tx.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0), roastOut=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to).reduce((a,r)=>a+num(r.roastedOut),0), waste=tx.filter(t=>t.type==='DEPT_ISSUE'&&state.departments.find(d=>d.code===t.ref)?.type==='Wastage').reduce((a,t)=>a+num(t.qty),0);
   const rows=reportRowsForClosing(from,to), varianceCount=rows.filter(r=>r.variance!==null&&Math.abs(r.variance)>.05).length;
   $('report-kpi-purchase').textContent=qty(purchase)+' kg';$('report-kpi-issue').textContent=qty(issue)+' kg';$('report-kpi-roast').textContent=qty(roastOut)+' kg';$('report-kpi-transfer').textContent=qty(transfer)+' kg';$('report-kpi-waste').textContent=qty(waste)+' kg';$('report-kpi-variance').textContent=String(varianceCount);
@@ -2362,9 +2519,10 @@ function renderReports(){
   const roasts=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to);$('report-roast-body').innerHTML=roasts.length?roasts.map(r=>{let loss=num(r.greenIn)-num(r.roastedOut),pct=r.greenIn?loss/r.greenIn*100:0;return `<tr><td>${esc(String(r.date).slice(0,10))}</td><td>${esc(r.batch)}</td><td>${esc(r.greenSku)}</td><td>${esc(r.roastedSku)}</td><td class="col-number">${qty(r.greenIn)}</td><td class="col-number">${qty(r.roastedOut)}</td><td class="col-number">${qty(loss)}</td><td class="col-number">${pct.toFixed(1)}%</td><td>${esc(r.transferDate||'')}</td></tr>`}).join(''):'<tr><td colspan="9" class="empty-state">No roast batches in selected period.</td></tr>';
   $('report-closing-body').innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.module)}</td><td><b>${esc(r.sku)}</b></td><td>${esc(r.item)}</td><td>${esc(r.uom)}</td><td class="col-number">${qty(r.opening)}</td><td class="col-number">${qty(r.inQty)}</td><td class="col-number">${qty(r.outQty)}</td><td class="col-number"><b>${qty(r.closing)}</b></td><td class="col-number">${r.physical===null?'—':qty(r.physical)}</td><td class="col-number ${r.variance!==null&&Math.abs(r.variance)>.05?'status-danger':'status-ok'}">${r.variance===null?'—':qty(r.variance)}</td></tr>`).join(''):'<tr><td colspan="10" class="empty-state">No closing balances for the selected scope.</td></tr>';
   const ds={};tx.filter(t=>t.type==='DEPT_ISSUE'&&t.module==='Packing').forEach(t=>{ds[t.ref]=(ds[t.ref]||0)+num(t.qty)});const total=Object.values(ds).reduce((a,v)=>a+v,0);$('report-dept-body').innerHTML=Object.entries(ds).sort((a,b)=>b[1]-a[1]).map(([code,v])=>{let d=state.departments.find(x=>x.code===code);return `<tr><td>${esc(d?.name||code)}</td><td>${esc(d?.type||'')}</td><td>${esc(code)}</td><td class="col-number">${qty(v)}</td><td>${total?(v/total*100).toFixed(1):'0.0'}%</td></tr>`}).join('')||'<tr><td colspan="5" class="empty-state">No department issues in selected period.</td></tr>';
+  renderReportDetail(from,to,tx,roasts,rows);setReportViewUI(activeReportView);
 }
 function applyReportMonth(){let m=$('report-month')?.value;if(!m)return;let [y,mo]=m.split('-').map(Number),last=new Date(y,mo,0).getDate();$('report-from').value=`${y}-${String(mo).padStart(2,'0')}-01`;$('report-to').value=`${y}-${String(mo).padStart(2,'0')}-${String(last).padStart(2,'0')}`;renderReports();toast('Month report applied')}
-function exportBoardReportCSV(){const {from,to}=reportDates(),rows=reportRowsForClosing(from,to),tx=periodTxns(from,to),roasts=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to),out=[['VK CONTROLS BOARD INVENTORY REPORT'],['Period',from,to],[],['MOVEMENT SUMMARY'],['Movement','Module','Quantity kg','Details'],['Purchase','Green Coffee',tx.filter(t=>t.type==='PURCHASE'&&t.module==='Green Coffee').reduce((a,t)=>a+num(t.qty),0),'Green bean purchases'],['Purchase','Retail',tx.filter(t=>t.type==='PURCHASE'&&t.module==='Retail').reduce((a,t)=>a+num(t.qty),0),'Retail / packaging purchases'],['Issue to Roastery','Green Coffee',tx.filter(t=>t.type==='ISSUE_TO_ROASTERY').reduce((a,t)=>a+num(t.qty),0),'Green coffee to roastery'],['Roast Output','Roastery',roasts.reduce((a,r)=>a+num(r.roastedOut),0),'Roasted beans created'],['Transfer','Packing',tx.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0),'Roastery to Packing'],['Department Issue','Packing',tx.filter(t=>t.type==='DEPT_ISSUE'&&t.module==='Packing').reduce((a,t)=>a+num(t.qty),0),'Packing dispatches / losses'],[],['CLOSING & VARIANCE'],['Module','SKU','Item','UOM','Opening','In / Purchase','Out / Issue','Closing','Physical','Variance'],...rows.map(r=>[r.module,r.sku,r.item,r.uom,r.opening,r.inQty,r.outQty,r.closing,r.physical??'',r.variance??'']),[],['ROASTING DETAIL'],['Date','Batch','Green SKU','Roasted SKU','Green In','Roasted Out','Loss kg','Loss %','Transfer Date'],...roasts.map(r=>{let loss=num(r.greenIn)-num(r.roastedOut);return [String(r.date).slice(0,10),r.batch,r.greenSku,r.roastedSku,r.greenIn,r.roastedOut,loss,r.greenIn?loss/r.greenIn*100:0,r.transferDate||'']})];exportCSV(out,`board-inventory-report-${from}-to-${to}.csv`);toast('Board report exported')}
+function exportBoardReportCSV(){const {from,to}=reportDates(),rows=reportRowsForClosing(from,to),tx=periodTxns(from,to),roasts=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to),out=[['VK CONTROLS BOARD INVENTORY REPORT'],['Period',from,to],[],['MOVEMENT SUMMARY'],['Movement','Module','Quantity kg','Details'],['Purchase','Green Coffee',tx.filter(t=>t.type==='PURCHASE'&&t.module==='Green Coffee').reduce((a,t)=>a+num(t.qty),0),'Green bean purchases'],['Purchase','Retail',tx.filter(t=>t.type==='PURCHASE'&&t.module==='Retail').reduce((a,t)=>a+num(t.qty),0),'Retail / packaging purchases'],['Issue to Roastery','Green Coffee',tx.filter(t=>t.type==='ISSUE_TO_ROASTERY').reduce((a,t)=>a+num(t.qty),0),'Green coffee to roastery'],['Roast Output','Roastery',roasts.reduce((a,r)=>a+num(r.roastedOut),0),'Roasted beans created'],['Transfer','Packing',tx.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0),'Roastery to Packing'],['Department Issue','Packing',tx.filter(t=>t.type==='DEPT_ISSUE'&&t.module==='Packing').reduce((a,t)=>a+num(t.qty),0),'Packing dispatches / losses'],['Opening Stock','All',tx.filter(t=>t.type==='OPENING_STOCK').reduce((a,t)=>a+num(t.qty),0),'Opening stock entries'],[],['CLOSING & VARIANCE'],['Module','SKU','Item','UOM','Opening','In / Purchase','Out / Issue','Closing','Physical','Variance'],...rows.map(r=>[r.module,r.sku,r.item,r.uom,r.opening,r.inQty,r.outQty,r.closing,r.physical??'',r.variance??'']),[],['ROASTING DETAIL'],['Date','Batch','Green SKU','Roasted SKU','Green In','Roasted Out','Loss kg','Loss %','Transfer Date'],...roasts.map(r=>{let loss=num(r.greenIn)-num(r.roastedOut);return [String(r.date).slice(0,10),r.batch,r.greenSku,r.roastedSku,r.greenIn,r.roastedOut,loss,r.greenIn?loss/r.greenIn*100:0,r.transferDate||'']})];exportCSV(out,`board-inventory-report-${from}-to-${to}.csv`);toast('Board report exported')}
 function renderLedger(){let rows=state.txns.slice(0,300);$('ledger-count-badge').textContent=state.txns.length+' Logs';$('ledger-table-body').innerHTML=rows.length?rows.map(t=>`<tr><td><b>${esc(t.id)}</b></td><td>${esc(t.businessDate||String(t.date||'').slice(0,10))}</td><td>${t.entryAt?new Date(t.entryAt).toLocaleString('en-IN'):new Date(t.date).toLocaleString('en-IN')}</td><td>${esc(t.module)}</td><td>${esc(t.type)}</td><td>${esc(t.sku)}</td><td>${qty(t.qty)}</td><td>${esc(t.ref)}</td><td>${esc(t.notes)}</td></tr>`).join(''):`<tr><td colspan="9" class="empty-state">No transactions logged.</td></tr>`}
 function renderDashboard(){let greenKg=state.greenLots.reduce((a,g)=>a+greenBalance(g),0),greenVal=state.greenLots.reduce((a,g)=>a+greenBalance(g)*num(g.cost),0),roastIn=state.roasts.reduce((a,r)=>a+num(r.greenIn),0),roastOut=state.roasts.reduce((a,r)=>a+num(r.roastedOut),0),packKg=Object.entries(state.packing).reduce((a,[s,x])=>a+(item(s)?.uom==='kg'?packingBalance(x):0),0),packUnits=Object.entries(state.packing).reduce((a,[s,x])=>a+(item(s)?.uom==='kg'?0:packingBalance(x)),0),retailVal=Object.entries(state.retail).reduce((a,[s,x])=>a+retailBalance(x)*num(item(s)?.cost),0);let variance=state.greenLots.filter(g=>Math.abs(num(g.physical)-greenBalance(g))>.05).length+Object.values(state.packing).filter(x=>Math.abs(num(x.physical)-packingBalance(x))>.05).length+Object.values(state.retail).filter(x=>Math.abs(num(x.physical)-retailBalance(x))>.05).length;$('dash-green-kg').textContent=qty(greenKg)+' kg';$('dash-green-val').textContent='Asset: '+money(greenVal);$('dash-roast-out').textContent=qty(roastOut)+' kg';$('dash-roast-loss').textContent=(roastIn?((roastIn-roastOut)/roastIn*100):0).toFixed(1)+'%';$('dash-pack-stock').textContent=qty(packKg)+' kg / '+qty(packUnits)+' u';$('dash-retail-val').textContent=money(retailVal);$('dash-variance-alerts').textContent=variance;let totalDept=departmentsWithTotals().reduce((a,d)=>a+d.issued,0);let colors=['#3a86ff','#8338ec','#ff006e','#e63946','#fb5607','#ffbe0b','#06d6a0'];let ds=departmentsWithTotals();$('dept-breakdown-grid').innerHTML=ds.map((d,i)=>`<div class="dept-pill"><span>${esc(d.name)}</span><strong>${qty(d.issued)} kg</strong><small>${totalDept?(d.issued/totalDept*100).toFixed(1):'0.0'}% of dispatches</small></div>`).join('');$('dept-distribution-bar').innerHTML=ds.map((d,i)=>`<span class="dist-segment" style="width:${totalDept?d.issued/totalDept*100:0}%;background:${colors[i%colors.length]}" title="${esc(d.name)}"></span>`).join('');$('dept-summary-table-body').innerHTML=ds.map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(d.type)}</td><td>${esc(d.code)}</td><td>${qty(d.issued)}</td><td>${totalDept?(d.issued/totalDept*100).toFixed(1):'0.0'}%</td></tr>`).join('');$('dash-recent-activity').innerHTML=state.txns.slice(0,8).map(t=>`<div class="list-row"><span>${esc(t.type)} · ${esc(t.sku||'—')}</span><span>${qty(t.qty)} ${esc(item(t.sku)?.uom||'')}</span></div>`).join('')||'<div class="empty-state">No recent movements.</div>';let coffeeGreenIssued=state.txns.filter(t=>t.type==='ISSUE_TO_ROASTERY').reduce((a,t)=>a+num(t.qty),0),coffeeCreated=state.roasts.reduce((a,r)=>a+num(r.roastedOut),0),coffeePacked=state.txns.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0),coffeeDispatched=state.txns.filter(t=>t.type==='DEPT_ISSUE'&&t.module==='Packing').reduce((a,t)=>a+num(t.qty),0);$('exec-coffee-green-issued').textContent=qty(coffeeGreenIssued)+' kg';$('exec-coffee-created').textContent=qty(coffeeCreated)+' kg';$('exec-coffee-packed').textContent=qty(coffeePacked)+' kg';$('exec-coffee-dispatched').textContent=qty(coffeeDispatched)+' kg';
   let low=state.items.filter(i=>{let b=0;if(i.category==='Green Coffee')b=state.greenLots.filter(g=>g.sku===i.sku).reduce((a,g)=>a+greenBalance(g),0);else if(i.category==='Roasted Coffee'||i.category==='Packaged Coffee')b=state.packing[i.sku]?packingBalance(state.packing[i.sku]):0;else b=state.retail[i.sku]?retailBalance(state.retail[i.sku]):0;return b<=num(i.reorder)&&num(i.reorder)>0});$('exec-active-skus').textContent=state.items.length;$('exec-locations').textContent=state.outlets.length+state.departments.length;$('exec-transactions').textContent=state.txns.length;$('exec-priority-alerts').textContent=low.length+variance;$('sidebar-badge-priority').textContent=low.length+variance;$('sidebar-badge-green').textContent=qty(greenKg)+' kg';$('exec-reorder-list').innerHTML=low.map(i=>`<div class="list-row"><span>${esc(i.sku)} — ${esc(i.name)}</span><span class="badge badge-danger">Reorder</span></div>`).join('')||'<div class="empty-state">No reorder priorities.</div>';$('exec-priority-list').innerHTML=variance?'<div class="list-row"><span>Physical/system variances detected</span><span class="badge badge-danger">'+variance+'</span></div>':'<div class="list-row"><span>No material variances</span><span class="badge badge-ok">Clear</span></div>'}
@@ -2471,8 +2629,17 @@ function handleOtpLogin(){
   try{sessionStorage.setItem('vkCoffeeAuth',JSON.stringify(auth));localStorage.removeItem('vkCoffeeRemember')}catch(e){}
   hideLogin(); toast('Welcome back, '+u.name);
 }
-function renderAll(){populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderReports();renderDashboard();renderOwner()}
-function switchTab(tab){qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',reports:'Board Reports',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
+function renderAll(){state.roasteryOpening ||= {};populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderReports();renderDashboard();renderOwner()}
+let reportNavOpen=false;
+function toggleReportNav(force){
+  const el=$('report-nav-subgroup');
+  if(!el)return;
+  reportNavOpen=typeof force==='boolean'?force:!reportNavOpen;
+  el.classList.toggle('open',reportNavOpen);
+  const btn=$('nav-reports');
+  if(btn)btn.setAttribute('aria-expanded',String(reportNavOpen));
+}
+function switchTab(tab){qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');if(tab==='reports')toggleReportNav(true);let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',reports:'Reports',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
 function openAddItemModal(){resetForm('form-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Add Master SKU Item';openModal('modal-item-master')}
 function editItem(id){let i=state.items.find(x=>x.id===id);if(!i)return;openModal('modal-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Edit Master SKU Item';$('im-edit-id').value=i.id;$('im-sku').value=i.sku;$('im-category').value=i.category;$('im-name').value=i.name;$('im-uom').value=i.uom;$('im-loss').value=i.loss;$('im-cost').value=i.cost;$('im-price').value=i.price;$('im-reorder').value=i.reorder;$('im-origin').value=i.origin||''}
 function deleteItem(id){if(!confirm('Delete this item from the master? Existing transactions will remain.'))return;state.items=state.items.filter(i=>i.id!==id);save();toast('Item deleted')}
@@ -2522,6 +2689,42 @@ function setGreenPhysical(id){let g=state.greenLots.find(x=>x.id===id);if(!g)ret
 function setPackingPhysical(sku){let x=state.packing[sku];let v=prompt('Enter physical count:',x.physical);if(v===null)return;x.physical=num(v);log('PHYSICAL_COUNT','Packing',sku,v,'','Physical count updated');save();toast('Physical count updated')}
 function setRetailPhysical(sku){let x=state.retail[sku];let v=prompt('Enter physical count:',x.physical);if(v===null)return;x.physical=num(v);log('PHYSICAL_COUNT','Retail',sku,v,'','Physical count updated');save();toast('Physical count updated')}
 function openNewRoastModal(){resetForm('form-roast-batch');setTxnDateDefaults();openModal('modal-new-roast')}
+function refreshOpeningStockItems(){
+  const mod=$('os-module')?.value||'Green Coffee', sel=$('os-sku'); if(!sel)return;
+  const cats=mod==='Green Coffee'?['Green Coffee']:mod==='Roastery'?['Roasted Coffee']:mod==='Packing'?['Roasted Coffee','Packaged Coffee']:['Packaging Material','Retail Merchandise'];
+  const list=state.items.filter(i=>cats.includes(i.category));
+  sel.innerHTML=list.map(i=>`<option value=\"${esc(i.sku)}\">${esc(i.sku)} — ${esc(i.name)}</option>`).join('');
+  const green=mod==='Green Coffee';
+  $('os-green-extra')?.style && ($('os-green-extra').style.display=green?'grid':'none');
+  $('os-green-cost-wrap')?.style && ($('os-green-cost-wrap').style.display=green?'block':'none');
+}
+function openOpeningStockModal(module){
+  resetForm('form-opening-stock');
+  if($('os-module'))$('os-module').value=module||'Green Coffee';
+  setTxnDateDefaults(); refreshOpeningStockItems(); openModal('modal-opening-stock');
+}
+function saveOpeningStock(){
+  const mod=$('os-module').value, d=validTxnDate($('os-date').value,'Opening Date'), sku=$('os-sku').value, q=num($('os-qty').value);
+  if(!sku||q<=0)throw Error('Select an item and enter a quantity greater than zero');
+  if(mod==='Green Coffee'){
+    const lot=$('os-lot').value.trim()||('OPEN-'+d.replace(/-/g,''));
+    let g=state.greenLots.find(x=>x.sku===sku&&x.lot===lot);
+    if(g){g.opening=num(g.opening)+q; if(g.physical===0)g.physical=q; if($('os-cost').value)g.cost=num($('os-cost').value);}
+    else {g={id:uid('LOT'),sku,lot,supplier:$('os-supplier').value.trim(),opening:q,purchases:0,issued:0,physical:q,cost:num($('os-cost').value)||num(item(sku)?.cost)};state.greenLots.push(g);}
+    log('OPENING_STOCK','Green Coffee',sku,q,lot,'Opening stock entered',d);
+  } else if(mod==='Roastery'){
+    state.roasteryOpening ||= {};
+    const x=state.roasteryOpening[sku]||{opening:0,physical:null}; x.opening=num(x.opening)+q; if(x.physical===null||x.physical===undefined)x.physical=q; state.roasteryOpening[sku]=x;
+    log('OPENING_STOCK','Roastery',sku,q,'OPENING','Opening roastery stock entered',d);
+  } else if(mod==='Packing'){
+    const x=state.packing[sku]||{opening:0,receiving:0,issued:0,physical:0}; x.opening=num(x.opening)+q; if(!num(x.physical))x.physical=q; state.packing[sku]=x;
+    log('OPENING_STOCK','Packing',sku,q,'OPENING','Opening packing stock entered',d);
+  } else {
+    const x=state.retail[sku]||{opening:0,receiving:0,issued:0,physical:0}; x.opening=num(x.opening)+q; if(!num(x.physical))x.physical=q; state.retail[sku]=x;
+    log('OPENING_STOCK','Retail',sku,q,'OPENING','Opening retail / packaging stock entered',d);
+  }
+  closeModal('modal-opening-stock'); save(); toast('Opening stock added');
+}
 function openGreenPurchaseModal(){resetForm('form-green-purchase');setTxnDateDefaults();openModal('modal-green-purchase')}
 function openIssueToRoasteryModal(){resetForm('form-issue-roastery');setTxnDateDefaults();openModal('modal-issue-roastery')}
 function openRetailPurchaseModal(){resetForm('form-retail-purchase');setTxnDateDefaults();openModal('modal-retail-purchase')}
@@ -2566,6 +2769,8 @@ function handleImportJSON(e){let f=e.target.files?.[0];if(!f)return;let r=new Fi
 function handleImportItemMasterCSV(e){let f=e.target.files?.[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let lines=r.result.split(/\r?\n/).filter(Boolean);let head=lines.shift().split(',').map(x=>x.replace(/^"|"$/g,''));let idx={};head.forEach((h,i)=>idx[h.trim()]=i);let added=0;for(const line of lines){let cols=line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(x=>x.replace(/^"|"$/g,''));let sku=cols[idx.SKU_Code];if(!sku)continue;let ex=state.items.find(i=>i.sku===sku);let obj={id:ex?.id||uid('ITEM'),sku,name:cols[idx.Item_Name]||sku,category:cols[idx.Category]||'Green Coffee',uom:cols[idx.UOM]||'kg',loss:num(cols[idx.Target_Roasting_Loss_Pct]),cost:num(cols[idx.Cost_Price]),price:num(cols[idx.Selling_Price]),reorder:num(cols[idx.Reorder_Level]),origin:cols[idx.Origin]||''};if(ex)Object.assign(ex,obj);else state.items.push(obj);added++}save();toast(added+' items imported')}catch(err){toast('CSV import failed','error')}};r.readAsText(f)}
 function submit(id,fn){$(id)?.addEventListener('submit',e=>{e.preventDefault();try{fn();}catch(err){console.error(err);toast(err.message||'Unable to save','error')}})}
 submit('form-owner-user',()=>{let id=$('owner-user-id').value.trim(),name=$('ou-name').value.trim(),email=$('ou-email').value.trim(),password=$('ou-password').value,loginOtp=String($('ou-login-otp').value||'').trim(); if(!name||!email)throw Error('Name and email are required'); if(loginOtp && !/^\d{6}$/.test(loginOtp))throw Error('Login OTP must be exactly 6 digits');let outlets=Array.from(document.querySelectorAll('#owner-outlet-checkboxes input:checked')).map(x=>x.value);let permissions=Array.from(document.querySelectorAll('#owner-permission-checkboxes input:checked')).map(x=>x.value);if(!permissions.length)throw Error('Select at least one permission');let ex=state.users.find(x=>x.id===id);if(ex){ex.name=name;ex.email=email;ex.role=$('ou-role').value;ex.status=$('ou-status').value;ex.outlets=outlets.length===ownerOutlets().length?'ALL':outlets;ex.permissions=permissions;if(ex.role==='Owner')ex.outlets='ALL';if(password.trim())ex.password=password.trim(); if(loginOtp)ex.loginOtp=loginOtp;}else{let u={id:uid('USER'),name,email,password:password.trim(),loginOtp:loginOtp||String(Math.floor(100000+Math.random()*900000)),role:$('ou-role').value,status:$('ou-status').value,outlets:outlets.length===ownerOutlets().length?'ALL':outlets,permissions};if(u.role==='Owner')u.outlets='ALL';state.users.push(u)}closeModal('modal-owner-user');save();toast(id?'User updated':'User created')});
+$('os-module')?.addEventListener('change',refreshOpeningStockItems);
+submit('form-opening-stock',saveOpeningStock);
 submit('form-green-purchase',()=>{let d=validTxnDate($('gp-date').value,'Purchase Date'),sku=$('gp-sku').value,q=num($('gp-qty').value),g=state.greenLots.find(x=>x.sku===sku&&x.lot===($('gp-lot').value||'NO-LOT'));if(g){g.purchases+=q;g.cost=num($('gp-cost').value)||g.cost}else{g={id:uid('LOT'),sku,lot:$('gp-lot').value||('LOT-'+new Date().getFullYear()+'-'+Date.now().toString().slice(-4)),supplier:$('gp-supplier').value||'',opening:0,purchases:q,issued:0,physical:q,cost:num($('gp-cost').value)||num(item(sku)?.cost)};state.greenLots.push(g)}log('PURCHASE','Green Coffee',sku,q,g.lot,$('gp-supplier').value,d);closeModal('modal-green-purchase');save();toast('Green coffee purchase recorded')});
 submit('form-issue-roastery',()=>{let d=validTxnDate($('ir-date').value,'Issue Date'),sku=$('ir-sku').value,q=num($('ir-qty').value),g=state.greenLots.find(x=>x.sku===sku);if(!g||greenBalance(g)<q)throw Error('Insufficient green coffee stock');g.issued+=q;log('ISSUE_TO_ROASTERY','Green Coffee',sku,q,'ROASTERY',$('ir-notes').value,d);closeModal('modal-issue-roastery');save();toast('Green coffee issued to roastery')});
 submit('form-roast-batch',()=>{let rd=validTxnDate($('rb-date').value,'Roast Date'),td=validTxnDate($('rb-transfer-date').value,'Transfer to Packing Date');if(td<rd)throw Error('Transfer to Packing Date cannot be before Roast Date');let gs=$('rb-green-sku').value,rs=$('rb-roasted-sku').value,gin=num($('rb-green-in').value),out=num($('rb-roasted-out').value);if(out>gin)throw Error('Roasted output cannot exceed green input');let g=state.greenLots.find(x=>x.sku===gs);if(!g||greenBalance(g)<gin)throw Error('Insufficient staged green coffee');let r={id:uid('ROAST'),batch:'RB-'+rd.replace(/-/g,'')+'-'+String(state.roasts.length+1).padStart(3,'0'),date:dateToISO(rd),transferDate:td,entryAt:now(),greenSku:gs,roastedSku:rs,greenIn:gin,roastedOut:out,machine:$('rb-machine').value,profile:$('rb-profile').value,notes:$('rb-notes').value};state.roasts.push(r);state.packing[rs] ||= {opening:0,receiving:0,issued:0,physical:0};state.packing[rs].receiving+=out;state.packing[rs].physical+=out;log('ROAST_COMPLETE','Roastery',gs,gin,rs,'Roast date '+rd+'; output '+out+' kg; loss '+(gin-out).toFixed(2)+' kg',rd);log('TRANSFER_TO_PACKING','Packing',rs,out,'PACKING','Transferred from Roastery on '+td,td);closeModal('modal-new-roast');save();toast('Roast batch and packing transfer recorded')});
@@ -2589,9 +2794,9 @@ document.getElementById('vk-forgot')?.addEventListener('click',handleForgotPassw
 document.getElementById('vk-otp-login')?.addEventListener('click',handleOtpLogin);
 qsa('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 ['green-search-input','roastery-search-input','packing-search-input','retail-search-input','item-master-search-input','item-master-category-filter'].forEach(id=>$(id)?.addEventListener('input',renderAll));
-['report-from','report-to','report-scope'].forEach(id=>$(id)?.addEventListener('input',renderReports));
+['report-from','report-to','report-inventory-scope'].forEach(id=>$(id)?.addEventListener('input',renderReports));
 $('mobile-menu-toggle')?.addEventListener('click',()=>document.querySelector('.sidebar')?.classList.toggle('mobile-open'));
-window.CoffeeApp={switchTab,openModal,closeModal,openAddItemModal,openNewOutletModal,editOutlet,editDepartment,editSelectedIssueDepartment,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,editIssueTransaction,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,exportBoardReportCSV,applyReportMonth,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
+window.CoffeeApp={switchTab,toggleReportNav,openModal,closeModal,openAddItemModal,openNewOutletModal,editOutlet,editDepartment,editSelectedIssueDepartment,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,editIssueTransaction,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,exportBoardReportCSV,applyReportMonth,openReportView,exportCurrentReportCSV,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
 /* ================= SUPABASE CLOUD AUTH / STATE ================= */
 const SUPABASE_URL='https://pvhzjvowztrazsbxzcok.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Y_U1fcYVOTYGD55ihuMbng_DZ2FUyVZ';
