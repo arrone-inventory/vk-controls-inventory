@@ -438,12 +438,12 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
           <span>Outlets &amp; Depts</span>
           <span class="nav-badge" style="background:rgba(212,163,115,0.2);color:var(--crema-primary);">+Cafes</span>
         </button>
-        <button class="nav-btn" id="nav-reports" onclick="window.CoffeeApp.switchTab('reports')">
+        <button class="nav-btn" id="nav-reports" onclick="window.CoffeeApp.toggleReportNav()">
           <span class="nav-icon">📊</span>
           <span>Reports</span>
-          <span class="nav-badge">All</span>
+          <span class="nav-badge">⌄</span>
         </button>
-        <div class="nav-subgroup report-nav-subgroup">
+        <div class="nav-subgroup report-nav-subgroup" id="report-nav-subgroup">
           <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('PURCHASE')"><span>📥</span><span>Purchase Reports</span></button>
           <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('ISSUE')"><span>📤</span><span>Issue Reports</span></button>
           <button class="nav-sub-btn" onclick="window.CoffeeApp.openReportView('TRANSFER')"><span>🔄</span><span>Transfer Reports</span></button>
@@ -1338,7 +1338,6 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
               <div class="form-group"><label class="form-label">Month</label><input type="month" id="report-month" class="form-control"></div>
               <div class="form-group"><label class="form-label">From Date</label><input type="date" id="report-from" class="form-control"></div>
               <div class="form-group"><label class="form-label">To Date</label><input type="date" id="report-to" class="form-control"></div>
-              <div class="form-group"><label class="form-label">Report Scope</label><select id="report-scope" class="form-control"><option value="PURCHASE">Purchase Reports</option><option value="ISSUE">Issue Reports</option><option value="TRANSFER">Transfer Reports</option><option value="ROASTING">Roasting Reports</option><option value="WASTAGE">Wastage Reports</option><option value="OPENING">Opening Stock Reports</option><option value="CLOSING">Closing &amp; Variance</option><option value="BOARD">Board Summary</option></select></div>
               <div class="form-group"><label class="form-label">Inventory Scope</label><select id="report-inventory-scope" class="form-control"><option value="ALL">All Inventory &amp; Coffee Operations</option><option value="GREEN">Green Coffee</option><option value="ROAST">Roasting &amp; Transfers</option><option value="PACKING">Packing &amp; Department Issues</option><option value="RETAIL">Retail &amp; Packaging</option></select></div>
             </div>
             <div class="report-filter-note">Use <b>Month + Apply Month</b> for a board month-end report, or enter any From/To dates for daily / custom-period reporting. Physical closing uses the latest recorded physical count on or before the report end date.</div>
@@ -1352,23 +1351,6 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
             <div class="report-kpi"><span>Wastage</span><strong id="report-kpi-waste">0.0 kg</strong><small>Department loss movements</small></div>
             <div class="report-kpi"><span>Variance Flags</span><strong id="report-kpi-variance">0</strong><small>Closing vs physical</small></div>
           </div>
-
-          <section class="table-container-card report-center-card">
-            <div class="report-section-head">
-              <div><h2 class="table-heading">📚 Report Centre</h2><div class="owner-muted">Choose one report type. The same date/month filters above are used for every report.</div></div>
-              <button class="topbar-btn primary" onclick="window.CoffeeApp.exportCurrentReportCSV()">📤 Export Current Report</button>
-            </div>
-            <div class="report-type-grid">
-              <button class="report-type-card" data-report-view="PURCHASE" onclick="window.CoffeeApp.openReportView('PURCHASE')"><span>📥</span><strong>Purchase Reports</strong><small>Receipts, supplier, SKU &amp; date</small></button>
-              <button class="report-type-card" data-report-view="ISSUE" onclick="window.CoffeeApp.openReportView('ISSUE')"><span>📤</span><strong>Issue Reports</strong><small>Roastery &amp; department issues</small></button>
-              <button class="report-type-card" data-report-view="TRANSFER" onclick="window.CoffeeApp.openReportView('TRANSFER')"><span>🔄</span><strong>Transfer Reports</strong><small>Roastery → Packing movements</small></button>
-              <button class="report-type-card" data-report-view="ROASTING" onclick="window.CoffeeApp.openReportView('ROASTING')"><span>🔥</span><strong>Roasting Reports</strong><small>Green in, roasted out &amp; loss</small></button>
-              <button class="report-type-card" data-report-view="WASTAGE" onclick="window.CoffeeApp.openReportView('WASTAGE')"><span>⚠️</span><strong>Wastage Reports</strong><small>Loss / wastage by date &amp; SKU</small></button>
-              <button class="report-type-card" data-report-view="OPENING" onclick="window.CoffeeApp.openReportView('OPENING')"><span>📦</span><strong>Opening Stock</strong><small>Opening balances by module &amp; SKU</small></button>
-              <button class="report-type-card" data-report-view="CLOSING" onclick="window.CoffeeApp.openReportView('CLOSING')"><span>📊</span><strong>Closing &amp; Variance</strong><small>Opening, closing, physical &amp; variance</small></button>
-              <button class="report-type-card" data-report-view="BOARD" onclick="window.CoffeeApp.openReportView('BOARD')"><span>📋</span><strong>Board Summary</strong><small>Management month-end summary</small></button>
-            </div>
-          </section>
 
           <section class="table-container-card report-section report-detail-section">
             <div class="report-section-head"><div><h2 class="table-heading" id="report-detail-title">📥 Purchase Report</h2><div class="owner-muted" id="report-detail-note">Detailed transactions for the selected period.</div></div></div>
@@ -2347,7 +2329,7 @@ button.action-btn{background:#f7f9f8!important;border-color:#d7e0dc!important;co
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.mobile-open{transform:translateX(0)}.main-wrapper{margin-left:0}.mobile-menu-toggle{display:inline-block;background:none;border:0;color:#fff;font-size:22px;margin-right:8px}.topbar{height:auto;padding:12px;gap:10px;align-items:flex-start}.topbar-right{display:none}.content-body{padding:12px}.kpi-grid,.executive-metrics-grid,.executive-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.flow-stages-grid{grid-template-columns:1fr}.dept-breakdown-grid{grid-template-columns:1fr}.table-toolbar{align-items:flex-start;flex-direction:column}.search-input{width:140px}}
 
 /* BOARD REPORTS — clean white/light-green reporting language */
-.report-center-card{margin-bottom:1.25rem}.report-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}.report-type-card{border:1px solid #d9e4df;background:#fff;border-radius:12px;padding:.9rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.2rem;transition:.15s ease}.report-type-card:hover{border-color:#0b8a68;transform:translateY(-1px)}.report-type-card.active{border-color:#0b8a68;box-shadow:0 0 0 2px rgba(11,138,104,.12);background:#eef8f4}.report-type-card span{font-size:1.15rem}.report-type-card strong{color:#0b3327;font-size:.85rem}.report-type-card small{color:#71817b;font-size:.68rem}.report-detail-section{margin-bottom:1.25rem}.report-nav-subgroup{margin-top:-.15rem;margin-bottom:.35rem}.report-nav-subgroup .nav-sub-btn{font-size:.78rem;padding:.42rem .55rem}.report-nav-subgroup .nav-sub-btn span:first-child{width:1rem}@media(max-width:1100px){.report-type-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.report-type-grid{grid-template-columns:1fr 1fr}}.report-header-card{padding:1.5rem;margin-bottom:1.25rem}.report-head-row{display:flex;justify-content:space-between;gap:1.25rem;align-items:flex-start}.report-title{margin:.2rem 0 .35rem;font-size:1.55rem;color:#0b3327}.report-subtitle{margin:0;color:#587067;font-size:.88rem}.report-actions{display:flex;gap:.6rem;flex-wrap:wrap}.report-filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.35fr;gap:1rem;margin-top:1.25rem}.report-filter-note{margin-top:.75rem;padding:.75rem .9rem;border-radius:10px;background:#eef6f2;border:1px solid #d5e6de;color:#49635a;font-size:.76rem}.report-kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.25rem}.report-kpi{background:#fff;border:1px solid #d9e4df;border-radius:14px;padding:1rem;box-shadow:0 4px 14px rgba(12,58,45,.05)}.report-kpi span{display:block;color:#587067;font-size:.76rem}.report-kpi strong{display:block;color:#0b6b4f;font-size:1.35rem;margin:.35rem 0}.report-kpi small{color:#7a8983;font-size:.68rem}.report-section{margin-bottom:1.25rem}.report-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}.report-section .table-heading{color:#0b3327}.report-section .owner-muted{color:#71817b}@media(max-width:1100px){.report-kpi-grid{grid-template-columns:repeat(3,1fr)}.report-filter-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.report-head-row{flex-direction:column}.report-filter-grid{grid-template-columns:1fr}.report-kpi-grid{grid-template-columns:1fr 1fr}}
+.report-center-card{margin-bottom:1.25rem}.report-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}.report-type-card{border:1px solid #d9e4df;background:#fff;border-radius:12px;padding:.9rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.2rem;transition:.15s ease}.report-type-card:hover{border-color:#0b8a68;transform:translateY(-1px)}.report-type-card.active{border-color:#0b8a68;box-shadow:0 0 0 2px rgba(11,138,104,.12);background:#eef8f4}.report-type-card span{font-size:1.15rem}.report-type-card strong{color:#0b3327;font-size:.85rem}.report-type-card small{color:#71817b;font-size:.68rem}.report-detail-section{margin-bottom:1.25rem}.report-nav-subgroup{margin-top:-.15rem;margin-bottom:.35rem;max-height:0;overflow:hidden;opacity:0;transition:max-height .18s ease,opacity .18s ease}.report-nav-subgroup.open{max-height:420px;opacity:1}.report-nav-subgroup .nav-sub-btn{font-size:.78rem;padding:.42rem .55rem}.report-nav-subgroup .nav-sub-btn span:first-child{width:1rem}@media(max-width:1100px){.report-type-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.report-type-grid{grid-template-columns:1fr 1fr}}.report-header-card{padding:1.5rem;margin-bottom:1.25rem}.report-head-row{display:flex;justify-content:space-between;gap:1.25rem;align-items:flex-start}.report-title{margin:.2rem 0 .35rem;font-size:1.55rem;color:#0b3327}.report-subtitle{margin:0;color:#587067;font-size:.88rem}.report-actions{display:flex;gap:.6rem;flex-wrap:wrap}.report-filter-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.35fr;gap:1rem;margin-top:1.25rem}.report-filter-note{margin-top:.75rem;padding:.75rem .9rem;border-radius:10px;background:#eef6f2;border:1px solid #d5e6de;color:#49635a;font-size:.76rem}.report-kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.25rem}.report-kpi{background:#fff;border:1px solid #d9e4df;border-radius:14px;padding:1rem;box-shadow:0 4px 14px rgba(12,58,45,.05)}.report-kpi span{display:block;color:#587067;font-size:.76rem}.report-kpi strong{display:block;color:#0b6b4f;font-size:1.35rem;margin:.35rem 0}.report-kpi small{color:#7a8983;font-size:.68rem}.report-section{margin-bottom:1.25rem}.report-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}.report-section .table-heading{color:#0b3327}.report-section .owner-muted{color:#71817b}@media(max-width:1100px){.report-kpi-grid{grid-template-columns:repeat(3,1fr)}.report-filter-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.report-head-row{flex-direction:column}.report-filter-grid{grid-template-columns:1fr}.report-kpi-grid{grid-template-columns:1fr 1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -2466,11 +2448,10 @@ function setReportViewUI(view){
   qsa('[data-report-view]').forEach(b=>b.classList.toggle('active',b.getAttribute('data-report-view')===view));
   const titles={PURCHASE:'📥 Purchase Report',ISSUE:'📤 Issue Report',TRANSFER:'🔄 Transfer Report',ROASTING:'🔥 Roasting Report',WASTAGE:'⚠️ Wastage Report',OPENING:'📦 Opening Stock Report',CLOSING:'📊 Closing & Variance Report',BOARD:'📋 Board Summary'};
   const notes={PURCHASE:'Green coffee and retail/packaging purchases recorded in the selected period.',ISSUE:'Green coffee issued to Roastery plus Packing/Retail department issues.',TRANSFER:'Roastery → Packing transfer movements recorded from the transaction ledger.',ROASTING:'Roast batches with green input, roasted output and loss percentage.',WASTAGE:'Department issues posted to a department marked as Wastage.',OPENING:'Opening stock entries recorded separately from purchases and issues.',CLOSING:'Opening, period inflow, period outflow, system closing, physical count and variance.',BOARD:'Management summary combining movements, production and closing information.'};
-  if($('report-scope'))$('report-scope').value=view;
   if($('report-detail-title'))$('report-detail-title').textContent=titles[view]||titles.PURCHASE;
   if($('report-detail-note'))$('report-detail-note').textContent=notes[view]||notes.PURCHASE;
 }
-function openReportView(view){switchTab('reports');setReportViewUI(view);renderReports();window.scrollTo({top:0,behavior:'smooth'});}
+function openReportView(view){toggleReportNav(true);switchTab('reports');setReportViewUI(view);renderReports();qsa('.report-nav-subgroup .nav-sub-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+view+"'")));window.scrollTo({top:0,behavior:'smooth'});}
 function renderReportDetail(from,to,tx,roasts,rows){
   let head='',body='';
   if(activeReportView==='PURCHASE'){
@@ -2518,7 +2499,7 @@ function renderReports(){
   const today=todayISO();
   if(!$('report-from').value)$('report-from').value=today.slice(0,8)+'01';
   if(!$('report-to').value)$('report-to').value=today;
-  const {from,to}=reportDates(), tx=periodTxns(from,to), scope=$('report-scope')?.value||'ALL';
+  const {from,to}=reportDates(), tx=periodTxns(from,to), scope=$('report-inventory-scope')?.value||'ALL';
   const purchase=tx.filter(t=>t.type==='PURCHASE').reduce((a,t)=>a+num(t.qty),0), issue=tx.filter(t=>t.type==='DEPT_ISSUE').reduce((a,t)=>a+num(t.qty),0), transfer=tx.filter(t=>t.type==='TRANSFER_TO_PACKING').reduce((a,t)=>a+num(t.qty),0), roastOut=state.roasts.filter(r=>String(r.date).slice(0,10)>=from&&String(r.date).slice(0,10)<=to).reduce((a,r)=>a+num(r.roastedOut),0), waste=tx.filter(t=>t.type==='DEPT_ISSUE'&&state.departments.find(d=>d.code===t.ref)?.type==='Wastage').reduce((a,t)=>a+num(t.qty),0);
   const rows=reportRowsForClosing(from,to), varianceCount=rows.filter(r=>r.variance!==null&&Math.abs(r.variance)>.05).length;
   $('report-kpi-purchase').textContent=qty(purchase)+' kg';$('report-kpi-issue').textContent=qty(issue)+' kg';$('report-kpi-roast').textContent=qty(roastOut)+' kg';$('report-kpi-transfer').textContent=qty(transfer)+' kg';$('report-kpi-waste').textContent=qty(waste)+' kg';$('report-kpi-variance').textContent=String(varianceCount);
@@ -2649,7 +2630,16 @@ function handleOtpLogin(){
   hideLogin(); toast('Welcome back, '+u.name);
 }
 function renderAll(){state.roasteryOpening ||= {};populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderReports();renderDashboard();renderOwner()}
-function switchTab(tab){qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',reports:'Reports',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
+let reportNavOpen=false;
+function toggleReportNav(force){
+  const el=$('report-nav-subgroup');
+  if(!el)return;
+  reportNavOpen=typeof force==='boolean'?force:!reportNavOpen;
+  el.classList.toggle('open',reportNavOpen);
+  const btn=$('nav-reports');
+  if(btn)btn.setAttribute('aria-expanded',String(reportNavOpen));
+}
+function switchTab(tab){qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');if(tab==='reports')toggleReportNav(true);let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',reports:'Reports',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
 function openAddItemModal(){resetForm('form-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Add Master SKU Item';openModal('modal-item-master')}
 function editItem(id){let i=state.items.find(x=>x.id===id);if(!i)return;openModal('modal-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Edit Master SKU Item';$('im-edit-id').value=i.id;$('im-sku').value=i.sku;$('im-category').value=i.category;$('im-name').value=i.name;$('im-uom').value=i.uom;$('im-loss').value=i.loss;$('im-cost').value=i.cost;$('im-price').value=i.price;$('im-reorder').value=i.reorder;$('im-origin').value=i.origin||''}
 function deleteItem(id){if(!confirm('Delete this item from the master? Existing transactions will remain.'))return;state.items=state.items.filter(i=>i.id!==id);save();toast('Item deleted')}
@@ -2805,9 +2795,8 @@ document.getElementById('vk-otp-login')?.addEventListener('click',handleOtpLogin
 qsa('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 ['green-search-input','roastery-search-input','packing-search-input','retail-search-input','item-master-search-input','item-master-category-filter'].forEach(id=>$(id)?.addEventListener('input',renderAll));
 ['report-from','report-to','report-inventory-scope'].forEach(id=>$(id)?.addEventListener('input',renderReports));
-$('report-scope')?.addEventListener('change',e=>{setReportViewUI(e.target.value);renderReports()});
 $('mobile-menu-toggle')?.addEventListener('click',()=>document.querySelector('.sidebar')?.classList.toggle('mobile-open'));
-window.CoffeeApp={switchTab,openModal,closeModal,openOpeningStockModal,openAddItemModal,openNewOutletModal,editOutlet,editDepartment,editSelectedIssueDepartment,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,editIssueTransaction,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,exportBoardReportCSV,applyReportMonth,openReportView,exportCurrentReportCSV,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
+window.CoffeeApp={switchTab,toggleReportNav,openModal,closeModal,openOpeningStockModal,openAddItemModal,openNewOutletModal,editOutlet,editDepartment,editSelectedIssueDepartment,editItem,deleteItem,deleteGreen,deleteDepartment,deleteOutlet,setGreenPhysical,setPackingPhysical,setRetailPhysical,openNewRoastModal,openGreenPurchaseModal,openIssueToRoasteryModal,openRetailPurchaseModal,openRetailIssueModal,editIssueTransaction,exportGreenCoffeeCSV,exportRoasteryCSV,exportPackingCSV,exportRetailCSV,exportItemMasterCSV,exportDatabaseJSON,exportBoardReportCSV,applyReportMonth,openReportView,exportCurrentReportCSV,resetToDemoData,handleImportJSON,handleImportItemMasterCSV,openOwnerUserModal,editOwnerUser,deleteOwnerUser,saveOwnerSettings,exportUsersCSV,logout};
 /* ================= SUPABASE CLOUD AUTH / STATE ================= */
 const SUPABASE_URL='https://pvhzjvowztrazsbxzcok.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Y_U1fcYVOTYGD55ihuMbng_DZ2FUyVZ';
