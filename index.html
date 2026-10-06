@@ -229,7 +229,7 @@
         <button class="nav-btn" id="nav-owner" onclick="window.CoffeeApp.switchTab('owner')">
           <span class="nav-icon">👑</span>
           <span>Owner Controls</span>
-          <span class="nav-badge">Admin</span>
+          <span class="nav-badge">Owner</span>
         </button>
       </nav>
 
@@ -1885,6 +1885,22 @@ async function loadOwnerSecurity(){
 function isOwnerClient(){
   try{const a=JSON.parse(sessionStorage.getItem('vkCoffeeAuth')||localStorage.getItem('vkCoffeeRemember')||'null');return a?.role==='Owner'}catch(e){return false}
 }
+async function syncAuthenticatedProfile(session){
+  if(!session?.user?.id) return false;
+  try{
+    const {data,error}=await supabase.from('profiles').select('id,name,email,role,status').eq('id',session.user.id).maybeSingle();
+    if(error) throw error;
+    if(!data) return false;
+    const profile={id:data.id,name:data.name||session.user.user_metadata?.name||session.user.email?.split('@')[0]||'User',email:data.email||session.user.email||'',role:data.role||'Viewer',status:data.status||'Active'};
+    let local=state.users.find(u=>u.id===profile.id)||state.users.find(u=>String(u.email||'').toLowerCase()===String(profile.email||'').toLowerCase());
+    if(local){local.name=profile.name;local.email=profile.email;local.role=profile.role;local.status=profile.status;}
+    else state.users.push({...profile,outlets:'ALL',permissions:profile.role==='Owner'?['Dashboard','Inventory','Purchasing','Roastery','Reports','Import/Export','User Access']:['Dashboard']});
+    const auth={id:profile.id,name:profile.name,role:profile.role};
+    sessionStorage.setItem('vkCoffeeAuth',JSON.stringify(auth));
+    if(!localStorage.getItem('vkCoffeeRemember')) localStorage.removeItem('vkCoffeeRemember');
+    return true;
+  }catch(e){console.warn('Authenticated profile load failed',e);return false}
+}
 async function loadCloudState(){
   try{
     const {data:{session}}=await supabase.auth.getSession();
@@ -1954,7 +1970,8 @@ async function loginUser(email,password,remember){
   const {data,error}=await supabase.auth.signInWithPassword({email:e,password:pw});
   if(error){toast(error.message||'Invalid username or password','error');return false}
   const user=data.user;
-  let profile=state.users.find(x=>String(x.email||'').toLowerCase()===e);
+  await syncAuthenticatedProfile({user});
+  let profile=state.users.find(x=>x.id===user.id)||state.users.find(x=>String(x.email||'').toLowerCase()===e);
   if(!profile){
     profile={id:user.id,name:user.user_metadata?.name||e.split('@')[0],email:e,role:'Viewer',status:'Active',outlets:'ALL',permissions:['Dashboard']};
     state.users.push(profile);
@@ -1980,7 +1997,7 @@ async function handleOtpLogin(){
   const otp=prompt('Enter the 6-digit code sent to your email:'); if(otp===null)return;
   const {data,error}=await supabase.auth.verifyOtp({email:e,token:String(otp).trim(),type:'email'});
   if(error){toast(error.message||'Invalid OTP','error');return}
-  const u=data.user; let profile=state.users.find(x=>String(x.email||'').toLowerCase()===e);
+  const u=data.user; await syncAuthenticatedProfile({user:u}); let profile=state.users.find(x=>x.id===u.id)||state.users.find(x=>String(x.email||'').toLowerCase()===e);
   if(!profile){profile={id:u.id,name:u.user_metadata?.name||e.split('@')[0],email:e,role:'Viewer',status:'Active',outlets:'ALL',permissions:['Dashboard']};state.users.push(profile)}
   if(profile.status==='Inactive'){await supabase.auth.signOut();toast('Your account is inactive. Contact the Owner.','error');return}
   try{sessionStorage.setItem('vkCoffeeAuth',JSON.stringify({id:u.id,name:profile.name,role:profile.role}));localStorage.removeItem('vkCoffeeRemember')}catch(e){}
@@ -2080,13 +2097,14 @@ ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
     const {data:{session}}=await supabase.auth.getSession();
     if(session){
       await loadCloudState();
+      await syncAuthenticatedProfile(session);
       await loadOwnerSecurity();
       renderAll();
       hideLogin();
     } else {showLogin();}
     supabase.auth.onAuthStateChange((event,session)=>{
       if(event==='SIGNED_OUT'){window.__vkCloudReady=false;showLogin();}
-      if(event==='SIGNED_IN' && session){loadCloudState().then(()=>loadOwnerSecurity()).then(()=>{renderAll();hideLogin();});}
+      if(event==='SIGNED_IN' && session){loadCloudState().then(()=>syncAuthenticatedProfile(session)).then(()=>loadOwnerSecurity()).then(()=>{renderAll();hideLogin();});}
     });
   }catch(e){console.error(e);showLogin();toast('Unable to connect to Supabase','error')}
 })();
