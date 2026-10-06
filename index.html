@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VK CONTROLS | Supabase Inventory Tracker</title>
   <meta name="description" content="End-to-end Specialty Coffee &amp; Retail Inventory Management OS. Track Green Coffee, Roastery output &amp; loss %, Packing Department issues, Website Sales, Outlets, B2B, Wastage, Grinder Loss, Lab Testing, Retail &amp; Item Master.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()">
 
   <!-- Typography: Outfit, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1813,7 +1816,7 @@
 @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.flow-stages-grid{grid-template-columns:1fr 1fr}.flow-connector{display:none}.dept-breakdown-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.mobile-open{transform:translateX(0)}.main-wrapper{margin-left:0}.mobile-menu-toggle{display:inline-block;background:none;border:0;color:#fff;font-size:22px;margin-right:8px}.topbar{height:auto;padding:12px;gap:10px;align-items:flex-start}.topbar-right{display:none}.content-body{padding:12px}.kpi-grid,.executive-metrics-grid,.executive-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.flow-stages-grid{grid-template-columns:1fr}.dept-breakdown-grid{grid-template-columns:1fr}.table-toolbar{align-items:flex-start;flex-direction:column}.search-input{width:140px}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script>
 (function(){
 'use strict';
@@ -1882,24 +1885,24 @@ async function loadOwnerSecurity(){
     return window.__ownerResetConfigured;
   }catch(e){console.warn('Owner security metadata unavailable',e);window.__ownerResetConfigured=false;return false}
 }
-function isOwnerClient(){
-  try{const a=JSON.parse(sessionStorage.getItem('vkCoffeeAuth')||localStorage.getItem('vkCoffeeRemember')||'null');return a?.role==='Owner'}catch(e){return false}
-}
+function isOwnerClient(){return window.__vkProfileRole==='Owner'}
 async function syncAuthenticatedProfile(session){
-  if(!session?.user?.id) return false;
+  if(!session?.user?.id) return null;
   try{
     const {data,error}=await supabase.from('profiles').select('id,name,email,role,status').eq('id',session.user.id).maybeSingle();
     if(error) throw error;
-    if(!data) return false;
-    const profile={id:data.id,name:data.name||session.user.user_metadata?.name||session.user.email?.split('@')[0]||'User',email:data.email||session.user.email||'',role:data.role||'Viewer',status:data.status||'Active'};
+    if(!data || data.status!=='Active'){window.__vkProfileRole=null;return null}
+    const profile={id:data.id,name:data.name||session.user.user_metadata?.name||session.user.email?.split('@')[0]||'User',email:data.email||session.user.email||'',role:data.role||'Viewer',status:data.status};
+    window.__vkProfileRole=profile.role;
     let local=state.users.find(u=>u.id===profile.id)||state.users.find(u=>String(u.email||'').toLowerCase()===String(profile.email||'').toLowerCase());
     if(local){local.name=profile.name;local.email=profile.email;local.role=profile.role;local.status=profile.status;}
     else state.users.push({...profile,outlets:'ALL',permissions:profile.role==='Owner'?['Dashboard','Inventory','Purchasing','Roastery','Reports','Import/Export','User Access']:['Dashboard']});
     const auth={id:profile.id,name:profile.name,role:profile.role};
     sessionStorage.setItem('vkCoffeeAuth',JSON.stringify(auth));
-    if(!localStorage.getItem('vkCoffeeRemember')) localStorage.removeItem('vkCoffeeRemember');
-    return true;
-  }catch(e){console.warn('Authenticated profile load failed',e);return false}
+    if(localStorage.getItem('vkCoffeeRemember')) localStorage.setItem('vkCoffeeRemember',JSON.stringify(auth));
+    else localStorage.removeItem('vkCoffeeRemember');
+    return profile;
+  }catch(e){window.__vkProfileRole=null;console.warn('Authenticated profile load failed',e);return null}
 }
 async function loadCloudState(){
   try{
@@ -1961,17 +1964,28 @@ function ensureLoginUsers(){
   let owner=state.users.find(u=>u.role==='Owner')||state.users[0];
   if(!owner){owner={id:'u-owner',name:'Main Owner',email:'',role:'Owner',status:'Active',outlets:'ALL',permissions:['Dashboard','Inventory','Purchasing','Roastery','Reports','Import/Export','User Access']};state.users.push(owner);}
 }
+function securityRateLimit(key,limit=5,windowMs=10*60*1000){
+  try{
+    const now=Date.now(), raw=localStorage.getItem('vkSecRL:'+key);
+    let a=raw?JSON.parse(raw):[]; a=a.filter(t=>now-t<windowMs);
+    if(a.length>=limit){const wait=Math.ceil((windowMs-(now-a[0]))/60000);toast('Too many attempts. Try again in about '+wait+' minute(s).','error');return false}
+    a.push(now);localStorage.setItem('vkSecRL:'+key,JSON.stringify(a));return true;
+  }catch(e){return true}
+}
+function securityRateClear(key){try{localStorage.removeItem('vkSecRL:'+key)}catch(e){}}
 function currentAuth(){try{return sessionStorage.getItem('vkCoffeeAuth')||localStorage.getItem('vkCoffeeRemember')||''}catch(e){return ''}}
 function showLogin(){document.getElementById('vk-login-screen')?.classList.remove('vk-hidden');document.querySelector('.app-layout')?.setAttribute('aria-hidden','true')}
 function hideLogin(){document.getElementById('vk-login-screen')?.classList.add('vk-hidden');document.querySelector('.app-layout')?.removeAttribute('aria-hidden')}
 async function loginUser(email,password,remember){
   const e=String(email||'').trim().toLowerCase(); const pw=String(password||'');
   if(!e||!pw){toast('Email and password are required','error');return false}
+  if(!securityRateLimit('login:'+e,5,10*60*1000)) return false;
   const {data,error}=await supabase.auth.signInWithPassword({email:e,password:pw});
   if(error){toast(error.message||'Invalid username or password','error');return false}
+  securityRateClear('login:'+e);
   const user=data.user;
-  await syncAuthenticatedProfile({user});
-  let profile=state.users.find(x=>x.id===user.id)||state.users.find(x=>String(x.email||'').toLowerCase()===e);
+  const profile=await syncAuthenticatedProfile({user});
+  if(!profile){await supabase.auth.signOut();toast('Your account profile could not be verified. Contact the Owner.','error');return false}
   if(!profile){
     profile={id:user.id,name:user.user_metadata?.name||e.split('@')[0],email:e,role:'Viewer',status:'Active',outlets:'ALL',permissions:['Dashboard']};
     state.users.push(profile);
@@ -1985,25 +1999,28 @@ async function logout(){try{await supabase.auth.signOut();sessionStorage.removeI
 function findLoginUser(email){return (state.users||[]).find(u=>String(u.email||'').toLowerCase()===String(email||'').trim().toLowerCase() && u.status!=='Inactive')}
 async function handleForgotPassword(){
   const email=prompt('Enter your organisation email:'); if(email===null)return;
-  const {error}=await supabase.auth.resetPasswordForEmail(String(email).trim(),{redirectTo:window.location.href});
+  const e=String(email).trim().toLowerCase(); if(!e)return;
+  if(!securityRateLimit('forgot:'+e,3,10*60*1000)) return;
+  const {error}=await supabase.auth.resetPasswordForEmail(e,{redirectTo:window.location.href});
   if(error){toast(error.message||'Unable to send password reset email','error');return}
   toast('Password reset email sent. Check your inbox.');
 }
 async function handleOtpLogin(){
   const email=prompt('Enter your organisation email:'); if(email===null)return;
   const e=String(email).trim().toLowerCase();
+  if(!e)return;
+  if(!securityRateLimit('otp:'+e,3,10*60*1000)) return;
   const {error:sendError}=await supabase.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
   if(sendError){toast(sendError.message||'Unable to send login OTP','error');return}
   const otp=prompt('Enter the 6-digit code sent to your email:'); if(otp===null)return;
   const {data,error}=await supabase.auth.verifyOtp({email:e,token:String(otp).trim(),type:'email'});
   if(error){toast(error.message||'Invalid OTP','error');return}
-  const u=data.user; await syncAuthenticatedProfile({user:u}); let profile=state.users.find(x=>x.id===u.id)||state.users.find(x=>String(x.email||'').toLowerCase()===e);
-  if(!profile){profile={id:u.id,name:u.user_metadata?.name||e.split('@')[0],email:e,role:'Viewer',status:'Active',outlets:'ALL',permissions:['Dashboard']};state.users.push(profile)}
+  const u=data.user; const profile=await syncAuthenticatedProfile({user:u}); if(!profile){await supabase.auth.signOut();toast('Your account profile could not be verified. Contact the Owner.','error');return}
   if(profile.status==='Inactive'){await supabase.auth.signOut();toast('Your account is inactive. Contact the Owner.','error');return}
   try{sessionStorage.setItem('vkCoffeeAuth',JSON.stringify({id:u.id,name:profile.name,role:profile.role}));localStorage.removeItem('vkCoffeeRemember')}catch(e){}
   await loadCloudState(); renderAll(); hideLogin(); toast('OTP login successful');
 }
-function renderAll(){populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderDashboard();renderOwner()}
+function renderAll(){populateSelects();renderGreen();renderRoastery();renderPacking();renderRetail();renderItems();renderDepartments();renderLedger();renderDashboard();renderOwner();const b=document.querySelector('#nav-owner .nav-badge');if(b)b.textContent=window.__vkProfileRole==='Owner'?'Owner':'Restricted';}
 function switchTab(tab){if(tab==='owner'&&!isOwnerClient()){toast('Owner Controls are restricted to the Owner','error');tab='dashboard'}qsa('.tab-pane').forEach(x=>x.classList.remove('active'));$('tab-'+tab)?.classList.add('active');qsa('.nav-btn,.nav-sub-btn').forEach(x=>x.classList.remove('active'));$('nav-'+tab)?.classList.add('active');let labels={dashboard:'Smart Dashboard',executive:'Executive Dashboard',green:'Green Coffee',roastery:'Roastery Unit',packing:'Packing Dept',retail:'Retail & Materials',itemmaster:'Item Master',departments:'Outlets & Depts',ledger:'Audit Ledger',impexp:'Import / Export',owner:'Owner Controls'};$('topbar-page-title').textContent=labels[tab]||tab;}
 function openAddItemModal(){resetForm('form-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Add Master SKU Item';openModal('modal-item-master')}
 function editItem(id){let i=state.items.find(x=>x.id===id);if(!i)return;openModal('modal-item-master');$('im-modal-title').innerHTML='<span>🏷️</span> Edit Master SKU Item';$('im-edit-id').value=i.id;$('im-sku').value=i.sku;$('im-category').value=i.category;$('im-name').value=i.name;$('im-uom').value=i.uom;$('im-loss').value=i.loss;$('im-cost').value=i.cost;$('im-price').value=i.price;$('im-reorder').value=i.reorder;$('im-origin').value=i.origin||''}
@@ -2019,7 +2036,7 @@ function openGreenPurchaseModal(){resetForm('form-green-purchase');setTxnDateDef
 function openIssueToRoasteryModal(){resetForm('form-issue-roastery');setTxnDateDefaults();openModal('modal-issue-roastery')}
 function openRetailPurchaseModal(){resetForm('form-retail-purchase');setTxnDateDefaults();openModal('modal-retail-purchase')}
 function openRetailIssueModal(){resetForm('form-retail-issue');setTxnDateDefaults();openModal('modal-retail-issue')}
-function exportCSV(rows,name){let csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportCSV(rows,name){const safe=v=>{let x=String(v??'');return /^[=+\-@]/.test(x)?'\t'+x:x};let csv=rows.map(r=>r.map(v=>`"${safe(v).replace(/"/g,'""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
 function exportGreenCoffeeCSV(){exportCSV([['SKU','Lot','Supplier','Opening kg','Purchases kg','Issued kg','Closing kg','Physical kg','Variance kg','Cost/kg','Asset'],...state.greenLots.map(g=>[g.sku,g.lot,g.supplier,g.opening,g.purchases,g.issued,greenBalance(g),g.physical,g.physical-greenBalance(g),g.cost,greenBalance(g)*g.cost])],'green-coffee-inventory.csv')}
 function exportRoasteryCSV(){exportCSV([['Batch','Date','Green SKU','Roasted SKU','Green In kg','Roasted Out kg','Loss kg','Loss %','Machine','Profile'],...state.roasts.map(r=>[r.batch,r.date,r.greenSku,r.roastedSku,r.greenIn,r.roastedOut,r.greenIn-r.roastedOut,r.greenIn?(r.greenIn-r.roastedOut)/r.greenIn*100:0,r.machine,r.profile])],'roastery-batches.csv')}
 function exportPackingCSV(){exportCSV([['SKU','Item','Opening','Receiving','Issued','Closing','Physical','Variance'],...Object.entries(state.packing).map(([s,x])=>[s,item(s)?.name||'',x.opening,x.receiving,x.issued,packingBalance(x),x.physical,x.physical-packingBalance(x)])],'packing-inventory.csv')}
@@ -2096,15 +2113,16 @@ ensureLoginUsers();renderAll();setTxnDateDefaults();switchTab('dashboard');
   try{
     const {data:{session}}=await supabase.auth.getSession();
     if(session){
+      const profile=await syncAuthenticatedProfile(session);
+      if(!profile){await supabase.auth.signOut();showLogin();return}
       await loadCloudState();
-      await syncAuthenticatedProfile(session);
       await loadOwnerSecurity();
       renderAll();
       hideLogin();
     } else {showLogin();}
     supabase.auth.onAuthStateChange((event,session)=>{
       if(event==='SIGNED_OUT'){window.__vkCloudReady=false;showLogin();}
-      if(event==='SIGNED_IN' && session){loadCloudState().then(()=>syncAuthenticatedProfile(session)).then(()=>loadOwnerSecurity()).then(()=>{renderAll();hideLogin();});}
+      if(event==='SIGNED_IN' && session){syncAuthenticatedProfile(session).then(profile=>{if(!profile)return supabase.auth.signOut();return loadCloudState()}).then(()=>loadOwnerSecurity()).then(()=>{if(window.__vkProfileRole){renderAll();hideLogin();}}).catch(()=>showLogin());}
     });
   }catch(e){console.error(e);showLogin();toast('Unable to connect to Supabase','error')}
 })();
