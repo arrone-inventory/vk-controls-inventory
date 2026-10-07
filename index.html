@@ -1982,7 +1982,26 @@ async function loginUser(email,password,remember){
   if(!e||!pw){toast('Email and password are required','error');return false}
   if(!securityRateLimit('login:'+e,5,10*60*1000)) return false;
   const {data,error}=await supabase.auth.signInWithPassword({email:e,password:pw});
-  if(error){toast(error.message||'Invalid username or password','error');return false}
+  if(error){
+    const msg=String(error.message||'').toLowerCase();
+    if(msg.includes('email not confirmed') || msg.includes('email_not_confirmed')){
+      if(!securityRateLimit('otp:'+e,3,10*60*1000)) return false;
+      const {error:otpErr}=await supabase.auth.signInWithOtp({email:e,options:{shouldCreateUser:false}});
+      if(otpErr){toast('Email is not confirmed. '+(otpErr.message||'Unable to send login OTP'),'error');return false}
+      const otp=prompt('This Login ID is created but the email is not confirmed. Enter the 6-digit OTP sent to '+e+':');
+      if(otp===null)return false;
+      const {data:otpData,error:verifyErr}=await supabase.auth.verifyOtp({email:e,token:String(otp).trim(),type:'email'});
+      if(verifyErr){toast(verifyErr.message||'Invalid OTP','error');return false}
+      securityRateClear('otp:'+e);
+      const user=otpData.user;
+      const profile=await syncAuthenticatedProfile({user});
+      if(!profile){await supabase.auth.signOut();toast('Your account profile could not be verified. Contact the Owner.','error');return false}
+      if(profile.status==='Inactive'){await supabase.auth.signOut();toast('Your account is inactive. Contact the Owner.','error');return false}
+      try{sessionStorage.setItem('vkCoffeeAuth',JSON.stringify({id:user.id,name:profile.name,role:profile.role}));localStorage.setItem('vkCoffeeRemember',JSON.stringify({id:user.id,name:profile.name,role:profile.role}))}catch(e){}
+      await loadCloudState();renderAll();hideLogin();toast('OTP login successful. Email confirmed.');return true;
+    }
+    toast(error.message||'Invalid username or password','error');return false
+  }
   securityRateClear('login:'+e);
   const user=data.user;
   const profile=await syncAuthenticatedProfile({user});
