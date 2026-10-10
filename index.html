@@ -85,6 +85,100 @@
 .app-layout .status-warn{color:#b7791f}
 .app-layout .mobile-menu-toggle{color:#17211c}
 </style>
+
+<style id="vk-compact-ui-v6">
+/* Compact layout so more inventory content fits on laptop/desktop screens. */
+.app-layout{font-size:13px}
+.app-layout .sidebar{width:220px}
+.app-layout .main-wrapper{margin-left:220px}
+.app-layout .sidebar-header{padding:14px;gap:9px}
+.app-layout .brand-badge{font-size:23px}
+.app-layout .sidebar-nav{padding:8px}
+.app-layout .nav-section-title{padding:9px 8px 5px;font-size:10px}
+.app-layout .nav-btn,.app-layout .nav-sub-btn{padding:8px;font-size:12px;gap:7px}
+.app-layout .sidebar-footer{padding:10px}
+.app-layout .topbar{height:56px;padding:0 16px}
+.app-layout .content-body{padding:16px}
+.app-layout .flow-pipeline-container{padding:14px}
+.app-layout .flow-stages-grid{gap:7px;margin-top:12px}
+.app-layout .flow-stage-card{padding:10px}
+.app-layout .stage-val-main,.app-layout .kpi-value{font-size:19px}
+.app-layout .kpi-grid{gap:9px;margin:12px 0}
+.app-layout .kpi-card,.app-layout .executive-metric-card{padding:11px}
+.app-layout .dept-summary-card{padding:14px;margin:12px 0}
+.app-layout .table-container-card{padding:12px;margin-bottom:12px}
+.app-layout .modern-table{font-size:11px}
+.app-layout .modern-table th,.app-layout .modern-table td{padding:7px 8px}
+.app-layout .table-heading{font-size:15px}
+.app-layout .form-group{margin-bottom:10px}
+.app-layout .form-control,.app-layout .filter-select{padding:7px;font-size:12px}
+.app-layout .modal-overlay{padding:12px}
+.app-layout .modal-container{width:min(640px,100%);max-height:88vh}
+.app-layout .modal-header,.app-layout .modal-footer{padding:10px 13px}
+.app-layout .modal-body{padding:13px}
+.app-layout .executive-hero{padding:16px}
+.app-layout .executive-metrics-grid{gap:9px;margin:12px 0}
+.app-layout .executive-metric-card strong{font-size:21px}
+.app-layout .executive-grid{gap:12px}
+.app-layout .executive-panel{padding:12px}
+.app-layout .owner-grid{gap:12px;margin:12px 0}
+.app-layout button,.app-layout input,.app-layout select,.app-layout textarea{max-width:100%}
+@media(max-width:1100px){.app-layout .sidebar{width:205px}.app-layout .main-wrapper{margin-left:205px}.app-layout .content-body{padding:12px}.app-layout .kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.app-layout .executive-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.app-layout .sidebar{width:260px}.app-layout .main-wrapper{margin-left:0}.app-layout .content-body{padding:10px}.app-layout .topbar{padding:10px;height:auto}.app-layout .kpi-grid,.app-layout .executive-metrics-grid,.app-layout .executive-grid{grid-template-columns:1fr}.app-layout .modern-table th,.app-layout .modern-table td{padding:6px;white-space:nowrap}.app-layout .modal-overlay{padding:8px}}
+</style>
+
+<style>
+
+/* VK CONTROLS LOGIN — compact laptop fit; dashboard styles unchanged */
+@media (min-width: 901px) {
+  .vk-login-screen { padding: 14px 4vw 10px; }
+  .vk-login-top { margin-bottom: 12px; }
+  .vk-login-shell { height: min(620px, calc(100vh - 112px)); min-height: 0; }
+  .vk-login-story { min-height: 0; height: 100%; }
+  .vk-story-content { padding: 32px 7%; margin-top: 12px; }
+  .vk-story-content h1 { font-size: clamp(36px, 4vw, 58px); line-height: 1.02; margin-bottom: 16px; }
+  .vk-story-content p { font-size: 15px; line-height: 1.45; }
+  .vk-feature-row { margin-top: 24px; gap: 10px; }
+  .vk-feature { min-height: 82px; padding: 12px; }
+  .vk-feature b { font-size: 20px; margin-bottom: 5px; }
+  .vk-feature strong, .vk-feature span { font-size: 11px; }
+  .vk-login-card { padding: 28px clamp(28px, 4vw, 52px); }
+  .vk-login-logo { margin-bottom: 22px; gap: 9px; }
+  .vk-login-cup { font-size: 38px; }
+  .vk-login-logo strong { font-size: 22px; }
+  .vk-login-logo span { font-size: 9px; }
+  .vk-login-heading h2 { font-size: 26px; margin-bottom: 6px; }
+  .vk-login-heading p { margin-bottom: 20px; font-size: 13px; }
+  .vk-input-wrap { height: 52px; padding: 0 14px; margin-bottom: 11px; }
+  .vk-input-wrap > span { font-size: 18px; margin-right: 10px; }
+  .vk-input-wrap input { font-size: 14px; }
+  .vk-login-options { margin: 8px 2px 17px; font-size: 12px; }
+  .vk-signin { height: 50px; font-size: 16px; }
+  .vk-or { margin: 18px 0 12px; font-size: 12px; }
+  .vk-otp-btn { height: 46px; font-size: 13px; }
+  .vk-otp-btn span { font-size: 17px; }
+  .vk-login-hint, .vk-demo-credential { margin-top: 8px; font-size: 10px; }
+  .vk-login-footer { margin-top: 9px; }
+}
+@media (min-width: 901px) and (max-height: 700px) {
+  .vk-login-screen { padding-top: 8px; padding-bottom: 6px; }
+  .vk-login-top { margin-bottom: 7px; }
+  .vk-login-shell { height: calc(100vh - 92px); }
+  .vk-login-card { padding-top: 18px; padding-bottom: 18px; }
+  .vk-login-logo { margin-bottom: 14px; }
+  .vk-login-heading p { margin-bottom: 13px; }
+  .vk-login-options { margin-bottom: 12px; }
+  .vk-or { margin: 12px 0 8px; }
+}
+</style>
+
+<style>
+/* VK CONTROLS LOGIN — requested 35% smaller on desktop; dashboard untouched */
+@media (min-width: 901px) {
+  body:has(.vk-login-screen) { zoom: 0.65; }
+}
+</style>
+
 </head>
 <body>
 
