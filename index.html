@@ -173,10 +173,12 @@
 </style>
 
 <style>
-/* VK CONTROLS LOGIN — requested 35% smaller on desktop; dashboard untouched */
+/* VK CONTROLS LOGIN — scale down only the login screen; never scale the dashboard */
 @media (min-width: 901px) {
-  body:has(.vk-login-screen) { zoom: 0.65; }
+  #vk-login-screen { zoom: 0.715; } /* 10% larger than the compact 0.65 size */
 }
+/* Keep the inventory workspace at normal readable size after login. */
+.app-layout { zoom: 1 !important; font-size: 14px; }
 </style>
 
 </head>
